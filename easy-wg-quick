@@ -58,7 +58,7 @@ ListenPort = $EXT_NET_PORT
 PrivateKey = $(cat wghub.key)
 SaveConfig = false
 
-PostUp = iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o eth0 -j TCPMSS --clamp-mss-to-pmtu
+PostUp = iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 PostUp = iptables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostUp = iptables -A FORWARD -i %i -j ACCEPT
 PostUp = sysctl -q -w net.ipv4.ip_forward=1
@@ -66,7 +66,7 @@ PostUp = sysctl -q -w net.ipv4.ip_forward=1
 PostDown = sysctl -q -w net.ipv4.ip_forward=0
 PostDown = iptables -D FORWARD -i %i -j ACCEPT
 PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
-PostDown = iptables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o eth0 -j TCPMSS --clamp-mss-to-pmtu
+PostDown = iptables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 EOF
     echo "Wireguard hub address is $EXT_NET_IP:$EXT_NET_PORT on $EXT_NET_IF."
     echo "Note: customize [Interface] section of wghub.conf if required!"
