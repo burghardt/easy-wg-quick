@@ -1,0 +1,175 @@
+#!/bin/sh
+# easy-wg-quick - Creates Wireguard configuration for hub and peers with ease
+# Copyright (C) 2019 Krzysztof Burghardt <krzysztof@burghardt.pl>
+#
+#
+# License
+# -------
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# You are encouraged to send comments, improvements or suggestions to
+# me at krzysztof@burghardt.pl
+#
+# For updates visit https://github.com/burghardt/easy-wg-quick
+
+update_seq_no() {
+    echo "$1" > seqno.txt
+}
+
+create_seq_no() {
+    echo "No seqno.txt... creating one!"
+    update_seq_no 10
+}
+
+get_seq_no() {
+    SEQNO=$(cat seqno.txt)
+    NEXT=$((SEQNO+1))
+    update_seq_no $NEXT
+    echo $SEQNO
+}
+
+create_psk() {
+    echo "No wgpsk.key... creating one!"
+    wg genpsk > wgpsk.key
+}
+
+create_hub_key() {
+    echo "No wghub.key... creating one!"
+    wg genkey > wghub.key
+}
+
+create_hub_conf() {
+    echo "No wghub.conf... creating one!"
+    cat > wghub.conf << EOF
+[Interface]
+Address = $INT_NET_HUB_IP$INT_NET_MASK
+ListenPort = $EXT_NET_PORT
+PrivateKey = $(cat wghub.key)
+SaveConfig = false
+
+PostUp = iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o eth0 -j TCPMSS --clamp-mss-to-pmtu
+PostUp = iptables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostUp = iptables -A FORWARD -i %i -j ACCEPT
+PostUp = sysctl -q -w net.ipv4.ip_forward=1
+
+PostDown = sysctl -q -w net.ipv4.ip_forward=0
+PostDown = iptables -D FORWARD -i %i -j ACCEPT
+PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostDown = iptables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o eth0 -j TCPMSS --clamp-mss-to-pmtu
+EOF
+    echo "Wireguard hub address is $EXT_NET_IP:$EXT_NET_PORT on $EXT_NET_IF."
+    echo "Note: customize [Interface] section of wghub.conf if required!"
+}
+
+create_new_client_conf() {
+    echo "No wgclient$1.conf... creating one!"
+    cat > wgclient$1.conf << EOF
+[Interface]
+Address = $INT_NET_PEER$1$INT_NET_MASK
+DNS = $INT_NET_DNS
+PrivateKey = $(wg genkey | tee wgclient$1.key)
+
+[Peer]
+PublicKey = $(wg pubkey < wghub.key)
+PresharedKey = $(cat wgpsk.key)
+AllowedIPs = 0.0.0.0/0, ::/0
+Endpoint = $EXT_NET_IP:$EXT_NET_PORT
+PersistentKeepalive = 25
+EOF
+}
+
+add_client_to_hub_conf() {
+    echo -n "Updating wghub.conf..."
+    cat >> wghub.conf << EOF
+
+[Peer]
+PublicKey = $(wg pubkey < wgclient$1.key)
+PresharedKey = $(cat wgpsk.key)
+AllowedIPs = $INT_NET_PEER$1$INT_NET_PEER_MASK
+EOF
+    echo " done!"
+cat << EOF
+
+Important: Deploy updayed wghub.conf configuration to wireguard with wg-quick:
+  sudo wg-quick down ./wghub.conf # if already configured
+  sudo wg-quick up ./wghub.conf
+  sudo wg show # to check status
+EOF
+}
+
+print_client_conf() {
+    cat wgclient$1.conf
+}
+
+print_client_qrcode() {
+    command -v qrencode >/dev/null && qrencode -t ansiutf8 < wgclient$1.conf
+    echo "Scan QR code with your phone or use \"wgclient$1.conf\" file."
+}
+
+create_new_client() {
+    create_new_client_conf $1
+    print_client_qrcode $1 || print_client_conf $1
+    add_client_to_hub_conf $1
+}
+
+create_conf_link() {
+    CONF_LINK="$2"
+    if test -e $CONF_LINK; then
+        echo "Unable create link. File \"$CONF_LINK\" exists."
+    else
+        ln -s wgclient$1.conf $CONF_LINK.conf
+    fi
+}
+
+print_conf_link_help() {
+    cat << EOF
+
+Note: passing argument to script creates symbolic link to created configuration
+      to help remembering which config was for which device. If you didn't pass
+      any argument you can still create a link manually with command:
+  ln -vfs wgclient$1.conf link_name.conf
+EOF
+}
+
+main() {
+    umask 077
+
+    CONF_LINK="$1"
+
+    EXT_NET_IF="$(ip route sh | grep '^default' | awk '{ print $5 }')"
+    EXT_NET_IP="$(ip addr sh $EXT_NET_IF | grep 'inet ' | xargs | \
+        awk -F'[ /]' '{ print $2 }')"
+    EXT_NET_PORT="51820"
+    INT_NET_HUB_IP="10.127.1.1"
+    INT_NET_MASK="/24"
+    INT_NET_DNS="1.1.1.1"
+    INT_NET_PEER="10.127.0."
+    INT_NET_PEER_MASK="/32"
+
+    test -f seqno.txt  || create_seq_no
+    test -f wgpsk.key  || create_psk
+    test -f wghub.key  || create_hub_key
+    test -f wghub.conf || create_hub_conf
+
+    SEQNO=$(get_seq_no)
+    test -f wgclient$SEQNO.conf || create_new_client $SEQNO
+
+    if test -n "$CONF_LINK"; then
+        create_conf_link $SEQNO $CONF_LINK
+    else
+        print_conf_link_help $SEQNO
+    fi
+}
+
+main "$1"
