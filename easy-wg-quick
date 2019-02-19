@@ -101,7 +101,7 @@ EOF
     echo " done!"
 cat << EOF
 
-Important: Deploy updayed wghub.conf configuration to wireguard with wg-quick:
+Important: Deploy updated wghub.conf configuration to wireguard with wg-quick:
   sudo wg-quick down ./wghub.conf # if already configured
   sudo wg-quick up ./wghub.conf
   sudo wg show # to check status

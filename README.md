@@ -105,7 +105,7 @@ No wgclient10.conf... creating one!
 Scan QR code with your phone or use "wgclient10.conf" file.
 Updating wghub.conf... done!
 
-Important: Deploy updayed wghub.conf configuration to wireguard with wg-quick:
+Important: Deploy updated wghub.conf configuration to wireguard with wg-quick:
   sudo wg-quick down ./wghub.conf # if already configured
   sudo wg-quick up ./wghub.conf
   sudo wg show # to check status
