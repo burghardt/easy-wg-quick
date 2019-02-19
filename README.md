@@ -145,7 +145,7 @@ peer: th8qYu0R0mgio2wPu1kz6/5OOgi6l8iy7OobK590LHw=
 ## License
 
 This project is licensed under the GPLv2 License - see the
-[LICENSE.md](LICENSE.md) file for details.
+[LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
