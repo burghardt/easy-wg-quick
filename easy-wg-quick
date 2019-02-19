@@ -124,11 +124,11 @@ create_new_client() {
 }
 
 create_conf_link() {
-    CONF_LINK="$2"
-    if test -e $CONF_LINK; then
-        echo "Unable create link. File \"$CONF_LINK\" exists."
+    SYMLINK="$2.conf"
+    if test -e $SYMLINK; then
+        echo "\nUnable to create symlink: \"$SYMLINK\" already exists."
     else
-        ln -s wgclient$1.conf $CONF_LINK.conf
+        ln -s wgclient$1.conf $SYMLINK
     fi
 }
 
