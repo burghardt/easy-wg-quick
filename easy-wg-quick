@@ -36,7 +36,7 @@ get_seq_no() {
     SEQNO=$(cat seqno.txt)
     NEXT=$((SEQNO+1))
     update_seq_no $NEXT
-    echo $SEQNO
+    echo "$SEQNO"
 }
 
 create_psk() {
@@ -74,11 +74,11 @@ EOF
 
 create_new_client_conf() {
     echo "No wgclient$1.conf... creating one!"
-    cat > wgclient$1.conf << EOF
+    cat > "wgclient$1.conf" << EOF
 [Interface]
 Address = $INT_NET_PEER$1$INT_NET_MASK
 DNS = $INT_NET_DNS
-PrivateKey = $(wg genkey | tee wgclient$1.key)
+PrivateKey = $(wg genkey | tee "wgclient$1.key")
 
 [Peer]
 PublicKey = $(wg pubkey < wghub.key)
@@ -90,11 +90,11 @@ EOF
 }
 
 add_client_to_hub_conf() {
-    echo -n "Updating wghub.conf..."
+    printf "Updating wghub.conf..."
     cat >> wghub.conf << EOF
 
 [Peer]
-PublicKey = $(wg pubkey < wgclient$1.key)
+PublicKey = $(wg pubkey < "wgclient$1.key")
 PresharedKey = $(cat wgpsk.key)
 AllowedIPs = $INT_NET_PEER$1$INT_NET_PEER_MASK
 EOF
@@ -109,26 +109,30 @@ EOF
 }
 
 print_client_conf() {
-    cat wgclient$1.conf
+    cat "wgclient$1.conf"
 }
 
 print_client_qrcode() {
-    command -v qrencode >/dev/null && qrencode -t ansiutf8 < wgclient$1.conf
+    qrencode -t ansiutf8 < "wgclient$1.conf"
     echo "Scan QR code with your phone or use \"wgclient$1.conf\" file."
 }
 
 create_new_client() {
-    create_new_client_conf $1
-    print_client_qrcode $1 || print_client_conf $1
-    add_client_to_hub_conf $1
+    create_new_client_conf "$1"
+    if command -v qrencode >/dev/null 2>&1; then
+        print_client_qrcode "$1"
+    else
+        print_client_conf "$1"
+    fi
+    add_client_to_hub_conf "$1"
 }
 
 create_conf_link() {
     SYMLINK="$2.conf"
-    if test -e $SYMLINK; then
-        echo "\nUnable to create symlink: \"$SYMLINK\" already exists."
+    if test -e "$SYMLINK"; then
+        printf '\nUnable to create symlink: "%s" already exists.\n' "$SYMLINK"
     else
-        ln -s wgclient$1.conf $SYMLINK
+        ln -s "wgclient$1.conf" "$SYMLINK"
     fi
 }
 
@@ -148,7 +152,7 @@ main() {
     CONF_LINK="$1"
 
     EXT_NET_IF="$(ip route sh | grep '^default' | awk '{ print $5 }')"
-    EXT_NET_IP="$(ip addr sh $EXT_NET_IF | grep 'inet ' | xargs | \
+    EXT_NET_IP="$(ip addr sh "$EXT_NET_IF" | grep 'inet ' | xargs | \
         awk -F'[ /]' '{ print $2 }')"
     EXT_NET_PORT="51820"
     INT_NET_HUB_IP="10.127.1.1"
@@ -163,12 +167,12 @@ main() {
     test -f wghub.conf || create_hub_conf
 
     SEQNO=$(get_seq_no)
-    test -f wgclient$SEQNO.conf || create_new_client $SEQNO
+    test -f "wgclient$SEQNO.conf" || create_new_client "$SEQNO"
 
     if test -n "$CONF_LINK"; then
-        create_conf_link $SEQNO $CONF_LINK
+        create_conf_link "$SEQNO" "$CONF_LINK"
     else
-        print_conf_link_help $SEQNO
+        print_conf_link_help "$SEQNO"
     fi
 }
 
