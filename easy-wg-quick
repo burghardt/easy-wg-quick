@@ -109,7 +109,9 @@ EOF
 }
 
 print_client_conf() {
+    echo "-----BEGIN CONFIG-----"
     cat "wgclient$1.conf"
+    echo "-----END CONFIG-----"
 }
 
 print_client_qrcode() {
