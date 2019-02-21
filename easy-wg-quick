@@ -59,14 +59,23 @@ PrivateKey = $(cat wghub.key)
 SaveConfig = false
 
 PostUp = iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
+PostUp = ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 PostUp = iptables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostUp = ip6tables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostUp = iptables -A FORWARD -i %i -j ACCEPT
+PostUp = ip6tables -A FORWARD -i %i -j ACCEPT
 PostUp = sysctl -q -w net.ipv4.ip_forward=1
+PostUp = sysctl -q -w net.ipv6.conf.all.forwarding=1 
 
 PostDown = sysctl -q -w net.ipv4.ip_forward=0
+PostDown = sysctl -q -w net.ipv6.conf.all.forwarding=0 
 PostDown = iptables -D FORWARD -i %i -j ACCEPT
+PostDown = ip6tables -D FORWARD -i %i -j ACCEPT
 PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostDown = ip6tables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = iptables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
+PostDown = ip6tables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
+
 EOF
     echo "Wireguard hub address is $EXT_NET_IP:$EXT_NET_PORT on $EXT_NET_IF."
     echo "Note: customize [Interface] section of wghub.conf if required!"
@@ -76,7 +85,7 @@ create_new_client_conf() {
     echo "No wgclient$1.conf... creating one!"
     cat > "wgclient$1.conf" << EOF
 [Interface]
-Address = $INT_NET_PEER$1$INT_NET_MASK
+Address = $INT_NET_PEER$1$INT_NET_MASK,$INT_NETv6_PEER$1$INT_NETv6_MASK
 DNS = $INT_NET_DNS
 PrivateKey = $(wg genkey | tee "wgclient$1.key")
 
@@ -96,7 +105,8 @@ add_client_to_hub_conf() {
 [Peer]
 PublicKey = $(wg pubkey < "wgclient$1.key")
 PresharedKey = $(cat wgpsk.key)
-AllowedIPs = $INT_NET_PEER$1$INT_NET_PEER_MASK
+AllowedIPs = $INT_NET_PEER$1$INT_NET_PEER_MASK,$INT_NETv6_PEER$1$INT_NETv6_MASK
+
 EOF
     echo " done!"
 cat << EOF
@@ -163,6 +173,11 @@ main() {
     INT_NET_PEER="10.127.0."
     INT_NET_PEER_MASK="/32"
 
+    ##ipv6
+    INT_NETv6_MASK="/64"
+    INT_NETv6_DNS="2606:4700:4700::1111"
+    INT_NETv6_PEER="fd86:ea04:1115::"
+    INT_NETv6_PEER_MASK="/64"
     test -f seqno.txt  || create_seq_no
     test -f wgpsk.key  || create_psk
     test -f wghub.key  || create_hub_key
