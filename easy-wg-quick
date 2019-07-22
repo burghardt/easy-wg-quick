@@ -157,7 +157,7 @@ main() {
     EXT_NET_IP="$(ip addr sh "$EXT_NET_IF" | grep 'inet ' | xargs | \
         awk -F'[ /]' '{ print $2 }')"
     EXT_NET_PORT="51820"
-    INT_NET_HUB_IP="10.127.1.1"
+    INT_NET_HUB_IP="10.127.0.1"
     INT_NET_MASK="/24"
     INT_NET_DNS="1.1.1.1"
     INT_NET_PEER="10.127.0."
