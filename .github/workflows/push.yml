@@ -11,3 +11,8 @@ jobs:
         uses: ./.github/actions/shellcheck
       - name: checkbashisms
         uses: ./.github/actions/checkbashisms
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: testrun
+        uses: actions/testrun
