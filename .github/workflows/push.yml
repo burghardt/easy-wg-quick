@@ -15,4 +15,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: testrun
-        uses: actions/testrun
+        uses: ./.github/actions/testrun
