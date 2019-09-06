@@ -1,6 +1,7 @@
 #!/bin/sh -lxe
 
-for I in $(seq 1 5)
-do
-    ./easy-wg-quick
-done
+./easy-wg-quick
+./easy-wg-quick
+./easy-wg-quick client01
+./easy-wg-quick client02
+./easy-wg-quick
