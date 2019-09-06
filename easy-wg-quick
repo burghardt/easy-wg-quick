@@ -23,6 +23,14 @@
 #
 # For updates visit https://github.com/burghardt/easy-wg-quick
 
+check_if_wg_is_installed() {
+    wg show interfaces >/dev/null 2>&1 || {
+        echo 'Unable to use "wg" command. Are wireguard tools installed?'
+        printf 'Read https://github.com/burghardt/easy-wg-quick#prerequisites\n'
+        exit 1
+    }
+}
+
 update_seq_no() {
     echo "$1" > seqno.txt
 }
@@ -163,6 +171,7 @@ main() {
     INT_NET_PEER="10.127.0."
     INT_NET_PEER_MASK="/32"
 
+    check_if_wg_is_installed
     test -f seqno.txt  || create_seq_no
     test -f wgpsk.key  || create_psk
     test -f wghub.key  || create_hub_key
