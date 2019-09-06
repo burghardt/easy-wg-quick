@@ -1,3 +1,3 @@
-#!/bin/sh -lxeu
+#!/bin/sh -lxe
 
 checkbashisms -fx easy-wg-quick

@@ -1,3 +1,3 @@
-#!/bin/sh -lxeu
+#!/bin/sh -lxe
 
 shellcheck -s sh easy-wg-quick
