@@ -121,7 +121,7 @@ print_client_qrcode() {
 
 create_new_client() {
     create_new_client_conf "$1"
-    if command -v qrencode >/dev/null 2>&1; then
+    if qrencode -V >/dev/null 2>&1; then
         print_client_qrcode "$1"
     else
         print_client_conf "$1"
