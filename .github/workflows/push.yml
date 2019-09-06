@@ -11,3 +11,10 @@ jobs:
         uses: ./.github/actions/shellcheck
       - name: checkbashisms
         uses: ./.github/actions/checkbashisms
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+      - name: testrun
+        uses: ./.github/actions/testrun
