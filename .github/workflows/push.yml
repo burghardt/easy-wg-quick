@@ -14,5 +14,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+      - name: checkout
+        uses: actions/checkout@master
       - name: testrun
         uses: ./.github/actions/testrun
