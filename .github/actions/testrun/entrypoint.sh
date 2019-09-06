@@ -2,5 +2,5 @@
 
 for I in $(seq 1 5)
 do
-    /easy-wg-quick
+    ./easy-wg-quick
 done

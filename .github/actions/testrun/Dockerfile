@@ -6,9 +6,6 @@ RUN apt-get install -y --no-install-recommends software-properties-common
 RUN add-apt-repository --yes ppa:wireguard/wireguard
 RUN apt-get install -y --no-install-recommends wireguard-tools
 
-ADD easy-wg-quick /easy-wg-quick
-RUN chmod +x /easy-wg-quick
-
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
