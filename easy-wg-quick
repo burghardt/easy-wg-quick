@@ -101,8 +101,8 @@ create_new_client_conf() {
     echo "No wgclient$1.conf... creating one!"
     cat > "wgclient$1.conf" << EOF
 [Interface]
-Address = $INT_NET_PEER$1$INT_NET_MASK$($NET6 && echo "$INT_NET6_PEER$1$INT_NET6_MASK")
-DNS = $INT_NET_DNS$($NET6 && echo "$INT_NET6_DNS")
+Address = $INT_NET_PEER$1$INT_NET_MASK$($NET6 && echo ", $INT_NET6_PEER$1$INT_NET6_MASK")
+DNS = $INT_NET_DNS$($NET6 && echo ", $INT_NET6_DNS")
 PrivateKey = $(wg genkey | tee "wgclient$1.key")
 
 [Peer]
@@ -121,7 +121,7 @@ add_client_to_hub_conf() {
 [Peer]
 PublicKey = $(wg pubkey < "wgclient$1.key")
 PresharedKey = $(cat wgpsk.key)
-AllowedIPs = $INT_NET_PEER$1$INT_NET_PEER_MASK$($NET6 && echo "$INT_NET6_PEER$1$INT_NET6_PEER_MASK")
+AllowedIPs = $INT_NET_PEER$1$INT_NET_PEER_MASK$($NET6 && echo ", $INT_NET6_PEER$1$INT_NET6_PEER_MASK")
 
 EOF
     echo " done!"
