@@ -196,7 +196,7 @@ main() {
         INT_NET6_MASK="/64"
         INT_NET6_DNS="2606:4700:4700::1111"
         INT_NET6_PEER="fdfc:2965:0503:e2ae::"
-        INT_NET6_PEER_MASK="/64"
+        INT_NET6_PEER_MASK="/128"
     }
 
     check_if_wg_is_installed
