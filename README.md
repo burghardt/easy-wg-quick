@@ -142,6 +142,34 @@ peer: th8qYu0R0mgio2wPu1kz6/5OOgi6l8iy7OobK590LHw=
   transfer: 32.64 MiB received, 95.24 MiB sent
 ```
 
+## Fine tunning
+
+### Enabling IPv6
+
+If global unicast IPv6 address is detected on server tunnels will be created
+with inner IPv6 addresses allocated. This allows hub's clients to connect over
+hub's IPv6 NAT to IPv6 network.
+
+To use outer IPv6 addresses (i.e. connect client to hub over IPv6) just set
+`EXT_NET_IF` and `EXT_NET_IP` variables in script to external network interface
+name and IPv6 address (or edit `wghub.conf`).
+
+### Redirecting DNS
+
+DNS redirection might be required to integrate with services like
+[Pi-hole](https://pi-hole.net/) or
+[Cloudflare DNS over TLS](https://github.com/qdm12/cloudflare-dns-server).
+This could be achieved by using port 53 UDP/TCP redirection in `wghub.conf`.
+
+```
+PostUp = iptables -t nat -A PREROUTING -i %i -p udp -m udp --dport 53 -j DNAT --to-destination 1.1.1.1:53
+PostUp = iptables -t nat -A PREROUTING -i %i -p tcp -m tcp --dport 53 -j DNAT --to-destination 1.1.1.1:53
+PostDown = iptables -t nat -D PREROUTING -i %i -p udp -m udp --dport 53 -j DNAT --to-destination 1.1.1.1:53
+PostDown = iptables -t nat -D PREROUTING -i %i -p tcp -m tcp --dport 53 -j DNAT --to-destination 1.1.1.1:53
+```
+
+When using IPv6 similar rules should be set independently with `ip6tables`.
+
 ## License
 
 This project is licensed under the GPLv2 License - see the
