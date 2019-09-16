@@ -31,6 +31,14 @@ check_if_wg_is_installed() {
     }
 }
 
+check_if_ipv6_is_available() {
+    ip -6 addr | grep -i 'scope global' >/dev/null 2>&1 && {
+        echo 'Looks like you have IPv6 available, enabling IPv6 in tunnels!'
+        return  0
+    }
+    return 1
+}
+
 update_seq_no() {
     echo "$1" > seqno.txt
 }
@@ -67,14 +75,23 @@ PrivateKey = $(cat wghub.key)
 SaveConfig = false
 
 PostUp = iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
+PostUp = ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 PostUp = iptables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostUp = ip6tables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostUp = iptables -A FORWARD -i %i -j ACCEPT
+PostUp = ip6tables -A FORWARD -i %i -j ACCEPT
 PostUp = sysctl -q -w net.ipv4.ip_forward=1
+PostUp = sysctl -q -w net.ipv6.conf.all.forwarding=1
 
 PostDown = sysctl -q -w net.ipv4.ip_forward=0
+PostDown = sysctl -q -w net.ipv6.conf.all.forwarding=0
 PostDown = iptables -D FORWARD -i %i -j ACCEPT
+PostDown = ip6tables -D FORWARD -i %i -j ACCEPT
 PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostDown = ip6tables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = iptables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
+PostDown = ip6tables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
+
 EOF
     echo "Wireguard hub address is $EXT_NET_IP:$EXT_NET_PORT on $EXT_NET_IF."
     echo "Note: customize [Interface] section of wghub.conf if required!"
@@ -84,8 +101,8 @@ create_new_client_conf() {
     echo "No wgclient$1.conf... creating one!"
     cat > "wgclient$1.conf" << EOF
 [Interface]
-Address = $INT_NET_PEER$1$INT_NET_MASK
-DNS = $INT_NET_DNS
+Address = $INT_NET_PEER$1$INT_NET_MASK$($NET6 && echo ", $INT_NET6_PEER$1$INT_NET6_MASK")
+DNS = $INT_NET_DNS$($NET6 && echo ", $INT_NET6_DNS")
 PrivateKey = $(wg genkey | tee "wgclient$1.key")
 
 [Peer]
@@ -104,7 +121,8 @@ add_client_to_hub_conf() {
 [Peer]
 PublicKey = $(wg pubkey < "wgclient$1.key")
 PresharedKey = $(cat wgpsk.key)
-AllowedIPs = $INT_NET_PEER$1$INT_NET_PEER_MASK
+AllowedIPs = $INT_NET_PEER$1$INT_NET_PEER_MASK$($NET6 && echo ", $INT_NET6_PEER$1$INT_NET6_PEER_MASK")
+
 EOF
     echo " done!"
 cat << EOF
@@ -166,10 +184,20 @@ main() {
         awk -F'[ /]' '{ print $2 }')"
     EXT_NET_PORT="51820"
     INT_NET_HUB_IP="10.127.0.1"
+
     INT_NET_MASK="/24"
     INT_NET_DNS="1.1.1.1"
     INT_NET_PEER="10.127.0."
     INT_NET_PEER_MASK="/32"
+
+    NET6=false
+    check_if_ipv6_is_available && {
+        NET6=true
+        INT_NET6_MASK="/64"
+        INT_NET6_DNS="2606:4700:4700::1111"
+        INT_NET6_PEER="fdfc:2965:0503:e2ae::"
+        INT_NET6_PEER_MASK="/128"
+    }
 
     check_if_wg_is_installed
     test -f seqno.txt  || create_seq_no
