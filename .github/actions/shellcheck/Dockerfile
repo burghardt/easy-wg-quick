@@ -1,4 +1,4 @@
-FROM debian:9.5-slim
+FROM debian:testing-slim
 
 RUN apt-get update
 RUN apt-get -y --no-install-recommends install shellcheck

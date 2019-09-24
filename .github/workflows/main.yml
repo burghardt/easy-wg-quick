@@ -1,8 +1,14 @@
-name: push workflow
-on: push
+name: easy-wg-quick workflow
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron:  '0 0 * * *'
 
 jobs:
   build:
+    name: sca check
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -12,6 +18,7 @@ jobs:
       - name: checkbashisms
         uses: ./.github/actions/checkbashisms
   test:
+    name: test run
     runs-on: ubuntu-latest
     steps:
       - name: checkout
