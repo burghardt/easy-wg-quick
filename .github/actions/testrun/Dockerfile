@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:latest
 
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends iproute2 qrencode
