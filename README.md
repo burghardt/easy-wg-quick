@@ -170,6 +170,20 @@ PostDown = iptables -t nat -D PREROUTING -i %i -p tcp -m tcp --dport 53 -j DNAT 
 
 When using IPv6 similar rules should be set independently with `ip6tables`.
 
+### Persisting configuration with systemd
+
+[Systemd](https://wiki.debian.org/systemd) may load configuration for both hub
+and clients using `wg-quick.service`.
+Note that also [native support](https://manpages.debian.org/buster/systemd/systemd.netdev.5.en.html#%5BWIREGUARD%5D_SECTION_OPTIONS)
+for setting up Wireguard interfaces exists (since version 237).
+
+```
+sudo cp wghub.conf /etc/wireguard/wghub.conf
+sudo systemctl enable wg-quick@wghub
+sudo systemctl start wg-quick@wghub
+systemctl status wg-quick@wghub
+```
+
 ## License
 
 This project is licensed under the GPLv2 License - see the
