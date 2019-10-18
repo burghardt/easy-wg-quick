@@ -1,7 +1,17 @@
 FROM debian:testing-slim
 
-RUN apt-get update
-RUN apt-get -y --no-install-recommends install shellcheck
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US
+
+ENV DEBIAN_FRONTEND noninteractive
+
+RUN apt-get update && \
+    apt-get install -y locales && \
+    locale-gen $LANG && \
+    apt-get full-upgrade -y && \
+    apt-get install -y --no-install-recommends shellcheck && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 ADD entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
