@@ -54,7 +54,15 @@ Wireguard configuration for hub and one peer. Any sequential invocation creates
 another peer configuration within same hub.
 
 ```
-./easy-wg-quick
+./easy-wg-quick # 1st run creates hub configuration and one client
+./easy-wg-quick # any other runs creates additional clients
+```
+
+Passing an argument to script creates symbolic link to created configuration
+to help remembering which config was for which device.
+
+```
+./easy-wg-quick named_client_configuration
 ```
 
 ### Sample output
