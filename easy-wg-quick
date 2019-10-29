@@ -91,19 +91,22 @@ PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = ip6tables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = iptables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 PostDown = ip6tables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
-
 EOF
     echo "Wireguard hub address is $EXT_NET_IP:$EXT_NET_PORT on $EXT_NET_IF."
     echo "Note: customize [Interface] section of wghub.conf if required!"
 }
 
 create_new_client_conf() {
-    echo "No wgclient$1.conf... creating one!"
-    cat > "wgclient$1.conf" << EOF
+    SEQNO="$1"
+    CONF_NAME="$2"
+
+    echo "No wgclient_$CONF_NAME.conf... creating one!"
+    cat > "wgclient_$CONF_NAME.conf" << EOF
+# $SEQNO: $CONF_NAME > wgclient_$CONF_NAME.conf
 [Interface]
-Address = $INT_NET_PEER$1$INT_NET_MASK$($NET6 && echo ", $INT_NET6_PEER$1$INT_NET6_MASK")
+Address = $INT_NET_PEER$SEQNO$INT_NET_MASK$($NET6 && echo ", $INT_NET6_PEER$SEQNO$INT_NET6_MASK")
 DNS = $INT_NET_DNS$($NET6 && echo ", $INT_NET6_DNS")
-PrivateKey = $(wg genkey | tee "wgclient$1.key")
+PrivateKey = $(wg genkey | tee "wgclient_$CONF_NAME.key")
 
 [Peer]
 PublicKey = $(wg pubkey < wghub.key)
@@ -115,14 +118,17 @@ EOF
 }
 
 add_client_to_hub_conf() {
+    SEQNO="$1"
+    CONF_NAME="$2"
+
     printf "Updating wghub.conf..."
     cat >> wghub.conf << EOF
 
+# $SEQNO: $CONF_NAME > wgclient_$CONF_NAME.conf
 [Peer]
-PublicKey = $(wg pubkey < "wgclient$1.key")
+PublicKey = $(wg pubkey < "wgclient_$CONF_NAME.key")
 PresharedKey = $(cat wgpsk.key)
-AllowedIPs = $INT_NET_PEER$1$INT_NET_PEER_MASK$($NET6 && echo ", $INT_NET6_PEER$1$INT_NET6_PEER_MASK")
-
+AllowedIPs = $INT_NET_PEER$SEQNO$INT_NET_PEER_MASK$($NET6 && echo ", $INT_NET6_PEER$1$INT_NET6_PEER_MASK")
 EOF
     echo " done!"
 cat << EOF
@@ -136,48 +142,58 @@ EOF
 
 print_client_conf() {
     echo "-----BEGIN CONFIG-----"
-    cat "wgclient$1.conf"
+    cat "wgclient_$1.conf"
     echo "-----END CONFIG-----"
 }
 
 print_client_qrcode() {
-    qrencode -t ansiutf8 < "wgclient$1.conf"
-    echo "Scan QR code with your phone or use \"wgclient$1.conf\" file."
+    qrencode -t ansiutf8 < "wgclient_$1.conf"
+    echo "Scan QR code with your phone or use \"wgclient_$1.conf\" file."
+}
+
+remove_temporary_client_key_file() {
+    rm -f "wgclient_$1.key"
+}
+
+check_conf_name_is_available() {
+    FILENAME="wgclient_$1.conf"
+    if test -e "$FILENAME"; then
+        printf '\nUnable to store configuration with chosen name: "%s" already exists.\n' "$FILENAME"
+        return 1
+    fi
+    return 0
+}
+
+print_conf_name_help() {
+    cat << EOF
+
+Note: passing argument to script creates client configuration with supplied
+      name to help remembering which config was for which device. If you
+      didn't pass any argument you can still rename created file manually
+      with command:
+  mv -vi wgclient_$1.conf wgclient_name.conf
+
+EOF
 }
 
 create_new_client() {
-    create_new_client_conf "$1"
+    SEQNO="$1"
+    CONF_NAME="$2"
+
+    create_new_client_conf "$SEQNO" "$CONF_NAME"
     if qrencode -V >/dev/null 2>&1; then
-        print_client_qrcode "$1"
+        print_client_qrcode "$CONF_NAME"
     else
-        print_client_conf "$1"
+        print_client_conf "$CONF_NAME"
     fi
-    add_client_to_hub_conf "$1"
-}
-
-create_conf_link() {
-    SYMLINK="$2.conf"
-    if test -e "$SYMLINK"; then
-        printf '\nUnable to create symlink: "%s" already exists.\n' "$SYMLINK"
-    else
-        ln -s "wgclient$1.conf" "$SYMLINK"
-    fi
-}
-
-print_conf_link_help() {
-    cat << EOF
-
-Note: passing argument to script creates symbolic link to created configuration
-      to help remembering which config was for which device. If you didn't pass
-      any argument you can still create a link manually with command:
-  ln -vfs wgclient$1.conf link_name.conf
-EOF
+    add_client_to_hub_conf "$SEQNO" "$CONF_NAME"
+    remove_temporary_client_key_file "$CONF_NAME"
 }
 
 main() {
     umask 077
 
-    CONF_LINK="$1"
+    CONF_NAME="$1"
 
     EXT_NET_IF="$(ip route sh | grep '^default' | awk '{ print $5 }')"
     EXT_NET_IP="$(ip addr sh "$EXT_NET_IF" | grep 'inet ' | xargs | \
@@ -206,12 +222,14 @@ main() {
     test -f wghub.conf || create_hub_conf
 
     SEQNO=$(get_seq_no)
-    test -f "wgclient$SEQNO.conf" || create_new_client "$SEQNO"
 
-    if test -n "$CONF_LINK"; then
-        create_conf_link "$SEQNO" "$CONF_LINK"
-    else
-        print_conf_link_help "$SEQNO"
+    if test -z "$CONF_NAME"; then
+        CONF_NAME="$SEQNO"
+        print_conf_name_help "$SEQNO"
+    fi
+
+    if check_conf_name_is_available "$CONF_NAME"; then
+        create_new_client "$SEQNO" "$CONF_NAME"
     fi
 }
 
