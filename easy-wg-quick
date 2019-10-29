@@ -55,6 +55,15 @@ get_seq_no() {
     echo "$SEQNO"
 }
 
+create_port_no() {
+    echo "No portno.txt... creating one!"
+    shuf -i 1025-65535 -n 1 > portno.txt
+}
+
+get_port_no() {
+    cat portno.txt
+}
+
 create_psk() {
     echo "No wgpsk.key... creating one!"
     wg genpsk > wgpsk.key
@@ -198,7 +207,6 @@ main() {
     EXT_NET_IF="$(ip route sh | grep '^default' | awk '{ print $5 }')"
     EXT_NET_IP="$(ip addr sh "$EXT_NET_IF" | grep 'inet ' | xargs | \
         awk -F'[ /]' '{ print $2 }')"
-    EXT_NET_PORT="51820"
     INT_NET_HUB_IP="10.127.0.1"
 
     INT_NET_MASK="/24"
@@ -217,11 +225,12 @@ main() {
 
     check_if_wg_is_installed
     test -f seqno.txt  || create_seq_no
+    SEQNO="$(get_seq_no)"
+    test -f portno.txt || create_port_no
+    EXT_NET_PORT="$(get_port_no)"
     test -f wgpsk.key  || create_psk
     test -f wghub.key  || create_hub_key
     test -f wghub.conf || create_hub_conf
-
-    SEQNO=$(get_seq_no)
 
     if test -z "$CONF_NAME"; then
         CONF_NAME="$SEQNO"

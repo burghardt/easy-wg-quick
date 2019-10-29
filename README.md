@@ -157,6 +157,17 @@ peer: th8qYu0R0mgio2wPu1kz6/5OOgi6l8iy7OobK590LHw=
 
 ## Fine tunning
 
+### Disabling random port assignment
+
+By default `easy-wg-quick` use random port number from range 1025-65535. When
+using static port number is required for firewall configuration or other
+reasons user can set preferred port number (80 in this example) in `portno.txt`
+file with command:
+
+```
+echo 80 > portno.txt
+```
+
 ### Enabling IPv6
 
 If global unicast IPv6 address is detected on server tunnels will be created
