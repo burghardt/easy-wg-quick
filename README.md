@@ -23,9 +23,30 @@ name and IP address (or edit `wghub.conf`). Optionally `qrencode` can be used
 to generate [QR codes](https://en.wikipedia.org/wiki/QR_code) for mobile
 applications.
 
+#### Debian, Ubuntu
+
 ```
-sudo apt install wireguard mawk grep iproute2 qrencode
+sudo apt install wireguard-tools mawk grep iproute2 qrencode
 ```
+
+#### Fedora, RHEL, CentOS
+
+```
+sudo dnf install wireguard-tools gawk grep iproute qrencode
+```
+
+#### FreeBSD
+
+```
+sudo pkg install wireguard shuf libqrencode
+```
+
+#### Installing Wireguard tools (and modules)
+
+This script requires only tools installed, but to use Wireguard module
+(or user-space implementation) is also required. Detailed install guide
+for various operating systems is available at
+[wireguard.com/install](https://www.wireguard.com/install/).
 
 Peers also requires Wireguard installed.
 [Android](https://play.google.com/store/apps/details?id=com.wireguard.android)
