@@ -31,11 +31,43 @@ check_if_wg_is_installed() {
     }
 }
 
+get_ext_net_if() {
+    if [ "x$(uname -s)" = "xFreeBSD" ]; then
+        route get default | awk '$1 == "interface:" { print $2 }'
+    elif [ "x$(uname -s)" = "xLinux" ]; then
+	ip route sh | awk '$1 == "default" { print $5 }'
+    else
+        echo 'Unsupported operating system. Unable to find default interface.'
+        exit 1
+    fi
+}
+
+get_if_ip() {
+    if [ "x$(uname -s)" = "xFreeBSD" ]; then
+        ifconfig $1 | awk '$1 == "inet" { print $2 }'
+    elif [ "x$(uname -s)" = "xLinux" ]; then
+	ip addr sh $1 | grep 'inet ' | xargs | awk -F'[ /]' '{ print $2 }'
+    else
+        echo 'Unsupported operating system. Unable to obtain IP address.'
+        exit 1
+    fi
+}
+
 check_if_ipv6_is_available() {
-    ip -6 addr | grep -i 'scope global' >/dev/null 2>&1 && {
-        echo 'Looks like you have IPv6 available, enabling IPv6 in tunnels!'
-        return  0
-    }
+    if [ "x$(uname -s)" = "xFreeBSD" ]; then
+	test -n "$(ifconfig $1 | awk '$1 == "inet6" { print $2 }' | grep -v %$1$)" \
+	    >/dev/null 2>&1 && {
+	    echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
+	    return  0
+	}
+    elif [ "x$(uname -s)" = "xLinux" ]; then
+	ip -6 addr | grep -i 'scope global' >/dev/null 2>&1 && {
+	    echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
+	    return  0
+	}
+    else
+        echo 'Unsupported operating system. Unable to detect IPv6 availability.'
+    fi
     return 1
 }
 
@@ -204,9 +236,8 @@ main() {
 
     CONF_NAME="$1"
 
-    EXT_NET_IF="$(ip route sh | grep '^default' | awk '{ print $5 }')"
-    EXT_NET_IP="$(ip addr sh "$EXT_NET_IF" | grep 'inet ' | xargs | \
-        awk -F'[ /]' '{ print $2 }')"
+    EXT_NET_IF="$(get_ext_net_if)"
+    EXT_NET_IP="$(get_if_ip $EXT_NET_IF)"
     INT_NET_HUB_IP="10.127.0.1"
 
     INT_NET_MASK="/24"
