@@ -31,40 +31,61 @@ check_if_wg_is_installed() {
     }
 }
 
-get_ext_net_if() {
+detect_ext_net_if() {
     if [ "x$(uname -s)" = "xFreeBSD" ]; then
         route get default | awk '$1 == "interface:" { print $2 }'
     elif [ "x$(uname -s)" = "xLinux" ]; then
-	ip route sh | awk '$1 == "default" { print $5 }'
-    else
-        echo 'Unsupported operating system. Unable to find default interface.'
-        exit 1
+        ip route sh | awk '$1 == "default" { print $5 }'
     fi
 }
 
-get_if_ip() {
-    if [ "x$(uname -s)" = "xFreeBSD" ]; then
-        ifconfig $1 | awk '$1 == "inet" { print $2 }'
-    elif [ "x$(uname -s)" = "xLinux" ]; then
-	ip addr sh $1 | grep 'inet ' | xargs | awk -F'[ /]' '{ print $2 }'
-    else
-        echo 'Unsupported operating system. Unable to obtain IP address.'
+create_ext_net_if() {
+    echo "No extnetif.txt... creating one!"
+    detect_ext_net_if > extnetif.txt
+    test -s extnetif.txt || {
+        echo 'Unable to detect external interface name.'
+        echo 'Set it manually in extnetif.txt file and star script again.'
         exit 1
+    }
+}
+
+get_ext_net_if() {
+    cat extnetif.txt
+}
+
+detect_ext_net_ip() {
+    if [ "x$(uname -s)" = "xFreeBSD" ]; then
+        ifconfig "$1" | awk '$1 == "inet" { print $2 }'
+    elif [ "x$(uname -s)" = "xLinux" ]; then
+        ip addr sh "$1" | grep 'inet ' | xargs | awk -F'[ /]' '{ print $2 }'
     fi
+}
+
+create_ext_net_ip() {
+    echo "No extnetip.txt... creating one!"
+    detect_ext_net_ip "$1" > extnetip.txt
+    test -s extnetip.txt || {
+        echo 'Unable to detect external interface IP address.'
+        echo 'Set it manually in extnetip.txt file and star script again.'
+        exit 1
+    }
+}
+
+get_ext_net_ip() {
+    cat extnetip.txt
 }
 
 check_if_ipv6_is_available() {
     if [ "x$(uname -s)" = "xFreeBSD" ]; then
-	test -n "$(ifconfig $1 | awk '$1 == "inet6" { print $2 }' | grep -v %$1$)" \
-	    >/dev/null 2>&1 && {
-	    echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
-	    return  0
-	}
+        test -n "$(ifconfig $1 | awk '$1 == "inet6" { print $2 }' | grep -v %$1$)" >/dev/null 2>&1 && {
+            echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
+            return  0
+        }
     elif [ "x$(uname -s)" = "xLinux" ]; then
-	ip -6 addr | grep -i 'scope global' >/dev/null 2>&1 && {
-	    echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
-	    return  0
-	}
+        ip -6 addr | grep -i 'scope global' >/dev/null 2>&1 && {
+            echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
+            return  0
+        }
     else
         echo 'Unsupported operating system. Unable to detect IPv6 availability.'
     fi
@@ -236,8 +257,10 @@ main() {
 
     CONF_NAME="$1"
 
+    test -f extnetif.txt || create_ext_net_if
     EXT_NET_IF="$(get_ext_net_if)"
-    EXT_NET_IP="$(get_if_ip $EXT_NET_IF)"
+    test -f extnetip.txt || create_ext_net_ip "$EXT_NET_IF"
+    EXT_NET_IP="$(get_ext_net_ip)"
     INT_NET_HUB_IP="10.127.0.1"
 
     INT_NET_MASK="/24"
@@ -246,7 +269,7 @@ main() {
     INT_NET_PEER_MASK="/32"
 
     NET6=false
-    check_if_ipv6_is_available && {
+    check_if_ipv6_is_available "$EXT_NET_IF" && {
         NET6=true
         INT_NET6_MASK="/64"
         INT_NET6_DNS="2606:4700:4700::1111"

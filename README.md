@@ -178,6 +178,36 @@ peer: th8qYu0R0mgio2wPu1kz6/5OOgi6l8iy7OobK590LHw=
 
 ## Fine tunning
 
+### Disabling external interface autodetection
+
+By default `easy-wg-quick` use interface with default routing done over it as
+external network interface of VPN hub. If autodetection fails or generation of
+configuration is done outside the hub (i.e. on
+[air gapped](https://en.wikipedia.org/wiki/Air_gap_%28networking%29) laptop)
+user can set interface name in `extnetif.txt` file with command:
+
+```
+echo vtnet0 > extnetif.txt
+```
+
+### Disabling external IP address autodetection
+
+By default `easy-wg-quick` uses IP address of interface that has default
+routing done over it as external IP address of VPN hub. This might not be true
+if hub is behind firewall or NAT/PAT/masquarading is done. User can set
+prefered IP address in `extnetip.txt` file with command:
+
+```
+echo 192.168.1.2 > extnetip.txt
+```
+
+In case of NAT/PAT/masquarading one can try to use service like
+[ifconfig.me](https://ifconfig.me/) for autodetection:
+
+```
+curl ifconfig.me/ip > extnetip.txt
+```
+
 ### Disabling random port assignment
 
 By default `easy-wg-quick` use random port number from range 1025-65535. When
