@@ -178,6 +178,36 @@ peer: th8qYu0R0mgio2wPu1kz6/5OOgi6l8iy7OobK590LHw=
 
 ## Fine tunning
 
+### Disabling external interface autodetection
+
+By default `easy-wg-quick` use interface with default routing done over it as
+external network interface of VPN hub. If autodetection fails or generation of
+configuration is done outside the hub (i.e. on
+[air gapped](https://en.wikipedia.org/wiki/Air_gap_%28networking%29) laptop)
+user can set interface name in `extnetif.txt` file with command:
+
+```
+echo vtnet0 > extnetif.txt
+```
+
+### Disabling external IP address autodetection
+
+By default `easy-wg-quick` uses IP address of interface that has default
+routing done over it as external IP address of VPN hub. This might not be true
+if hub is behind firewall or NAT/PAT/masquarading is done. User can set
+prefered IP address in `extnetip.txt` file with command:
+
+```
+echo 192.168.1.2 > extnetip.txt
+```
+
+In case of NAT/PAT/masquarading one can try to use service like
+[ifconfig.me](https://ifconfig.me/) for autodetection:
+
+```
+curl ifconfig.me/ip > extnetip.txt
+```
+
 ### Disabling random port assignment
 
 By default `easy-wg-quick` use random port number from range 1025-65535. When
@@ -187,6 +217,34 @@ file with command:
 
 ```
 echo 80 > portno.txt
+```
+
+### Choosing firewall type
+
+Firewall type is guessed from operating system. For Linux `iptables` and
+`ip6tables` are used. For FreeBSD basic `pf` NAT rules are implemented.
+File `fwtype.txt` contains name of firewall type. To override autodetection
+or disable any rules run one of the following commands:
+
+```
+echo iptables > fwtype.txt # to choose Linux netfilter
+echo pf > fwtype.txt       # to choose OpenBSD PF
+echo custom > fwtype.txt   # to include predefined commands from file
+echo none  > fwtype.txt    # to skip any setup during wg-quick up/down
+```
+
+If `fwtype.txt` contains word `custom` content of `commands.txt` is included
+in the `wghub.conf` file.
+
+Format of `commands.txt` is:
+```
+PostUp = echo "command 1"
+PostUp = echo "command 2"
+PostUp = ...
+
+PostDown = echo "command 1"
+PostDown = secho "command 2"
+PostDown = ...
 ```
 
 ### Enabling IPv6
