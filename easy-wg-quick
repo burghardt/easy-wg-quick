@@ -190,7 +190,7 @@ create_hub_conf() {
     echo "No wghub.conf... creating one!"
     cat > wghub.conf << EOF
 [Interface]
-Address = $INT_NET_HUB_IP$INT_NET_MASK
+Address = $INT_NET_HUB_IP$INT_NET_MASK$($NET6 && echo ", $INT_NET6_HUB_IP$INT_NET6_MASK")
 ListenPort = $EXT_NET_PORT
 PrivateKey = $(cat wghub.key)
 SaveConfig = false
@@ -328,6 +328,7 @@ main() {
     NET6=false
     check_if_ipv6_is_available "$EXT_NET_IF" && {
         NET6=true
+        INT_NET6_HUB_IP="fdfc:2965:0503:e2ae::1"
         INT_NET6_MASK="/64"
         INT_NET6_DNS="2606:4700:4700::1111"
         INT_NET6_PEER="fdfc:2965:0503:e2ae::"
