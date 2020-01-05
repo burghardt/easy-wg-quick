@@ -304,5 +304,4 @@ This project is licensed under the GPLv2 License - see the
 ## Acknowledgments
 
 OpenVPN's [easy-rsa](https://github.com/OpenVPN/easy-rsa) was an inspiration
-for writting this script.
-for writting this script.
+for writing this script.
