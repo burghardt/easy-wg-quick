@@ -58,14 +58,14 @@ are supported.
 Just download the script and make it executable with `chmod`.
 
 ```
-wget https://raw.githubusercontent.com/ishrak1010/easy-wg-quick/master/easy-wg-quick
+wget https://raw.githubusercontent.com/burghardt/easy-wg-quick/master/easy-wg-quick
 chmod +x easy-wg-quick
 ```
 
 Or clone repository.
 
 ```
-git clone https://github.com/ishrak1010/easy-wg-quick.git
+git clone https://github.com/burghardt/easy-wg-quick.git
 ```
 
 ## Usage
@@ -304,4 +304,5 @@ This project is licensed under the GPLv2 License - see the
 ## Acknowledgments
 
 OpenVPN's [easy-rsa](https://github.com/OpenVPN/easy-rsa) was an inspiration
+for writting this script.
 for writting this script.
