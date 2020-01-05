@@ -58,14 +58,14 @@ are supported.
 Just download the script and make it executable with `chmod`.
 
 ```
-wget https://raw.githubusercontent.com/burghardt/easy-wg-quick/master/easy-wg-quick
+wget https://raw.githubusercontent.com/ishrak1010/easy-wg-quick/master/easy-wg-quick
 chmod +x easy-wg-quick
 ```
 
 Or clone repository.
 
 ```
-git clone https://github.com/burghardt/easy-wg-quick.git
+git clone https://github.com/ishrak1010/easy-wg-quick.git
 ```
 
 ## Usage
@@ -217,6 +217,15 @@ file with command:
 
 ```
 echo 80 > portno.txt
+```
+
+### Setting custom DNS
+
+By default `easy-wg-quick` uses 1.1.1.1 as it's internal DNS. You can use the 
+command below to serve a custom DNS to clients.
+
+```
+echo 8.8.8.8 > intnetdns.txt
 ```
 
 ### Choosing firewall type

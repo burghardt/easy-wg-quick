@@ -140,6 +140,15 @@ get_port_no() {
     cat portno.txt
 }
 
+create_int_net_dns() {
+    echo "No intnetdns.txt... creating one!"
+    echo "1.1.1.1" > intnetdns.txt
+}
+
+get_int_net_dns() {
+    cat intnetdns.txt
+}
+
 create_psk() {
     echo "No wgpsk.key... creating one!"
     wg genpsk > wgpsk.key
@@ -318,7 +327,8 @@ main() {
     INT_NET_HUB_IP="10.127.0.1"
 
     INT_NET_MASK="/24"
-    INT_NET_DNS="1.1.1.1"
+    test -f intnetdns.txt || create_int_net_dns
+    INT_NET_DNS="$(get_int_net_dns)"
     INT_NET_PEER="10.127.0."
     INT_NET_PEER_MASK="/32"
 
