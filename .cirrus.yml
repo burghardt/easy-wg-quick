@@ -9,7 +9,7 @@ test_task:
   env:
     CIRRUS_CLONE_DEPTH: 10
   pkginstall_script:
-    - pkg install -y net/wireguard sysutils/shuf graphics/libqrencode
+    - pkg install -y net/wireguard graphics/libqrencode
   1st_test_run_script:
     - ./easy-wg-quick
   2nd_test_run_script:

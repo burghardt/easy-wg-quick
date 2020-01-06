@@ -133,7 +133,7 @@ get_seq_no() {
 
 create_port_no() {
     echo "No portno.txt... creating one!"
-    shuf -i 1025-65535 -n 1 > portno.txt
+    (shuf -i 1025-65535 -n 1 || jot -r 1 1025 65535) > portno.txt
 }
 
 get_port_no() {

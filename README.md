@@ -38,7 +38,7 @@ sudo dnf install wireguard-tools gawk grep iproute qrencode
 #### FreeBSD
 
 ```
-sudo pkg install wireguard shuf libqrencode
+sudo pkg install wireguard libqrencode
 ```
 
 #### Installing Wireguard tools (and modules)
