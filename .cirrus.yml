@@ -1,0 +1,29 @@
+# https://cirrus-ci.com/github/burghardt/easy-wg-quick
+test_task:
+  name: FreeBSD test run
+  freebsd_instance:
+    matrix:
+      image_family: freebsd-13-0-snap
+      image_family: freebsd-12-1-snap
+      image_family: freebsd-11-3-snap
+  env:
+    CIRRUS_CLONE_DEPTH: 10
+  pkginstall_script:
+    - pkg install -y net/wireguard graphics/libqrencode
+  configure_script:
+    - echo none > fwtype.txt
+  1st_test_run_script:
+    - ./easy-wg-quick
+  2nd_test_run_script:
+    - ./easy-wg-quick named_client
+  dump_configuration_script:
+    - head *.txt *.key *.conf
+  dump_hub_configuration_script:
+    - cat wghub.conf
+  check_for_empty_files_script:
+    - ls *.txt *.key *.conf | xargs -tn1 test -s
+  setup_wireguard_interface_script:
+    - wg-quick up ./wghub.conf
+  check_interface_script:
+    - ifconfig wghub
+    - wg show

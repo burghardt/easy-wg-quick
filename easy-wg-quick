@@ -44,7 +44,7 @@ create_ext_net_if() {
     detect_ext_net_if > extnetif.txt
     test -s extnetif.txt || {
         echo 'Unable to detect external interface name.'
-        echo 'Set it manually in extnetif.txt file and star script again.'
+        echo 'Set it manually in extnetif.txt file and start script again.'
         exit 1
     }
 }
@@ -66,7 +66,7 @@ create_ext_net_ip() {
     detect_ext_net_ip "$1" > extnetip.txt
     test -s extnetip.txt || {
         echo 'Unable to detect external interface IP address.'
-        echo 'Set it manually in extnetip.txt file and star script again.'
+        echo 'Set it manually in extnetip.txt file and start script again.'
         exit 1
     }
 }
@@ -88,7 +88,7 @@ create_fw_type() {
     detect_fw_type > fwtype.txt
     test -s fwtype.txt || {
         echo 'Unable to detect firewall type.'
-        echo 'Set it manually in fwtype.txt file and star script again.'
+        echo 'Set it manually in fwtype.txt file and start script again.'
         exit 1
     }
 }
@@ -133,7 +133,12 @@ get_seq_no() {
 
 create_port_no() {
     echo "No portno.txt... creating one!"
-    shuf -i 1025-65535 -n 1 > portno.txt
+    (shuf -i 1025-65535 -n 1 || jot -r 1 1025 65535) > portno.txt 2>/dev/null
+    test -s portno.txt || {
+        echo 'Unable to assign random port for Wireguard.'
+        echo 'Set it manually in portno.txt file and start script again.'
+        exit 1
+    }
 }
 
 get_port_no() {
