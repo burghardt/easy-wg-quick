@@ -10,6 +10,8 @@ test_task:
     CIRRUS_CLONE_DEPTH: 10
   pkginstall_script:
     - pkg install -y net/wireguard graphics/libqrencode
+  configure_script:
+    - echo none > fwtype.txt
   1st_test_run_script:
     - ./easy-wg-quick
   2nd_test_run_script:
