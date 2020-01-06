@@ -219,6 +219,15 @@ file with command:
 echo 80 > portno.txt
 ```
 
+### Setting custom DNS
+
+By default `easy-wg-quick` uses 1.1.1.1 as it's internal DNS. You can use the 
+command below to serve a custom DNS to clients.
+
+```
+echo 8.8.8.8 > intnetdns.txt
+```
+
 ### Choosing firewall type
 
 Firewall type is guessed from operating system. For Linux `iptables` and
@@ -295,4 +304,4 @@ This project is licensed under the GPLv2 License - see the
 ## Acknowledgments
 
 OpenVPN's [easy-rsa](https://github.com/OpenVPN/easy-rsa) was an inspiration
-for writting this script.
+for writing this script.
