@@ -221,11 +221,22 @@ echo 80 > portno.txt
 
 ### Setting custom DNS
 
-By default `easy-wg-quick` uses 1.1.1.1 as it's internal DNS. You can use the 
-command below to serve a custom DNS to clients.
+#### Setting IPv4 resolver address
+
+By default `easy-wg-quick` uses 1.1.1.1 as it's internal DNS. You can use the
+command below to serve a custom IPv4 DNS to clients.
 
 ```
 echo 8.8.8.8 > intnetdns.txt
+```
+
+#### Setting IPv6 resolver address
+
+By default `easy-wg-quick` uses 2606:4700:4700::1111 as it's internal DNS. You
+can use the command below to serve a custom IPv6 DNS to clients.
+
+```
+echo 2001:4860:4860::8888 > intnet6dns.txt
 ```
 
 ### Choosing firewall type
@@ -281,6 +292,13 @@ PostDown = iptables -t nat -D PREROUTING -i %i -p tcp -m tcp --dport 53 -j DNAT 
 ```
 
 When using IPv6 similar rules should be set independently with `ip6tables`.
+
+```
+PostUp = ip6tables -t nat -A PREROUTING -i %i -p udp -m udp --dport 53 -j DNAT --to-destination 2606:4700:4700::1111:53
+PostUp = ip6tables -t nat -A PREROUTING -i %i -p tcp -m tcp --dport 53 -j DNAT --to-destination 2606:4700:4700::1111:53
+PostDown = ip6tables -t nat -D PREROUTING -i %i -p udp -m udp --dport 53 -j DNAT --to-destination 2606:4700:4700::1111:53
+PostDown = ip6tables -t nat -D PREROUTING -i %i -p tcp -m tcp --dport 53 -j DNAT --to-destination 2606:4700:4700::1111:53
+```
 
 ### Persisting configuration with systemd
 
