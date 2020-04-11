@@ -154,6 +154,15 @@ get_int_net_dns() {
     cat intnetdns.txt
 }
 
+create_int_net6_dns() {
+    echo "No intnet6dns.txt... creating one!"
+    echo "2606:4700:4700::1111" > intnet6dns.txt
+}
+
+get_int_net6_dns() {
+    cat intnet6dns.txt
+}
+
 create_psk() {
     echo "No wgpsk.key... creating one!"
     wg genpsk > wgpsk.key
@@ -345,7 +354,8 @@ main() {
         NET6=true
         INT_NET6_HUB_IP="fdfc:2965:0503:e2ae::1"
         INT_NET6_MASK="/64"
-        INT_NET6_DNS="2606:4700:4700::1111"
+        test -f intnet6dns.txt || create_int_net6_dns
+        INT_NET6_DNS="$(get_int_net6_dns)"
         INT_NET6_PEER="fdfc:2965:0503:e2ae::"
         INT_NET6_PEER_MASK="/128"
     }
