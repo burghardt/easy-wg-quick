@@ -1,6 +1,6 @@
 #!/usr/bin/env bats
 
-load teardown
+load teardown setup
 
 @test "single run" {
     run ../easy-wg-quick
