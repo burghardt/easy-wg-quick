@@ -3,6 +3,7 @@
 load teardown setup
 
 @test "run without external interface autodetection" {
+    echo iptables > fwtype.txt
     echo vtnet0 > extnetif.txt
     run ../easy-wg-quick
     [ "$status" -eq 0 ]
