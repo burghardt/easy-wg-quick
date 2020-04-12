@@ -10,6 +10,9 @@ test_task:
     CIRRUS_CLONE_DEPTH: 10
   pkginstall_script:
     - pkg install -y net/wireguard graphics/libqrencode
+    - pkg install -y shells/bash devel/bats-core
+  unittests_script:
+    - cd tests && ./runtests.bash
   configure_script:
     - echo none > fwtype.txt
   1st_test_run_script:
