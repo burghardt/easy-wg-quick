@@ -247,10 +247,10 @@ File `fwtype.txt` contains name of firewall type. To override autodetection
 or disable any rules run one of the following commands:
 
 ```
-echo iptables > fwtype.txt # to choose Linux netfilter
-echo pf > fwtype.txt       # to choose OpenBSD PF
-echo custom > fwtype.txt   # to include predefined commands from file
-echo none  > fwtype.txt    # to skip any setup during wg-quick up/down
+echo iptables > fwtype.txt  # to choose Linux netfilter
+echo pf       > fwtype.txt  # to choose OpenBSD PF
+echo custom   > fwtype.txt  # to include predefined commands from file
+echo none     > fwtype.txt  # to skip any setup during wg-quick up/down
 ```
 
 If `fwtype.txt` contains word `custom` content of `commands.txt` is included
@@ -265,6 +265,25 @@ PostUp = ...
 PostDown = echo "command 1"
 PostDown = secho "command 2"
 PostDown = ...
+```
+
+### Choosing if PostUp/PostDown should enable/disable IP forwarding
+
+Sysctl command syntax is guessed from operating system. Linux and FreeBSD
+are supported. As enabling IP forwarding is required for hub to forward VPN
+traffic to the Internet it is managed by PostUp/PostDown settings by default.
+Some application (i.e. [Docker](https://success.docker.com/article/ipv4-forwarding))
+might require that IP forwarding is never disabled. In that case setting `none`
+in `sysctltype.txt` and managing IP forwarding settings
+[elsewhere](https://en.wikipedia.org/wiki/Sysctl) might be required.
+
+File `sysctltype.txt` contains name of sysctl type. To override autodetection
+or disable any commands from being run use one of the following commands:
+
+```
+echo linux   > sysctltype.txt  # to choose Linux sysctl command
+echo freebsd > sysctltype.txt  # to choose FreeBSD sysctl command
+echo none    > sysctltype.txt  # to skip any setup during wg-quick up/down
 ```
 
 ### Enabling IPv6
