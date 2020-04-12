@@ -120,7 +120,10 @@ get_sysctl_type() {
 }
 
 check_if_ipv6_is_available() {
-    if test "x$(uname -s)" = "xFreeBSD"; then
+    if test -f forceipv6.txt; then
+        echo 'File forceipv6.txt exists. Enabling IPv6 in tunnels!'
+        return  0
+    elif test "x$(uname -s)" = "xFreeBSD"; then
         IPV6ADR=$(ifconfig "$1" | awk '$1 == "inet6" { print $2 }' | grep -v "%$1$")
         test -n "$IPV6ADR" && {
             echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'

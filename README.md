@@ -288,9 +288,16 @@ echo none    > sysctltype.txt  # to skip any setup during wg-quick up/down
 
 ### Enabling IPv6
 
-If global unicast IPv6 address is detected on server tunnels will be created
+If a global unicast IPv6 address is detected on server tunnels will be created
 with inner IPv6 addresses allocated. This allows hub's clients to connect over
 hub's IPv6 NAT to IPv6 network.
+
+If a global unicast IPv6 address is not detected, the existence of a file
+ named `forceipv6.txt` can forcibly enable IPv6 support.
+
+```
+touch forceipv6.txt
+```
 
 To use outer IPv6 addresses (i.e. connect client to hub over IPv6) just set
 `EXT_NET_IF` and `EXT_NET_IP` variables in script to external network interface
