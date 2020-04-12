@@ -18,10 +18,12 @@ jobs:
       - name: checkbashisms
         uses: ./.github/actions/checkbashisms
   test:
-    name: test run
+    name: tests
     runs-on: ubuntu-latest
     steps:
       - name: checkout
         uses: actions/checkout@master
-      - name: testrun
+      - name: unit tests
+        uses: ./.github/actions/bats
+      - name: test run
         uses: ./.github/actions/testrun
