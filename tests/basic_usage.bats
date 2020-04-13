@@ -20,6 +20,8 @@ load teardown setup
     echo enp5s0 > extnetif.txt
     echo 192.168.1.1 > extnetip.txt
     echo 12345 > portno.txt
+    echo 10.127.0. > intnetaddress.txt
+    echo fdfc:2965:0503:e2ae:: > intnet6address.txt
     echo 8.8.8.8 > intnetdns.txt
     echo 2001:4860:4860::8888 > intnet6dns.txt
     echo none > fwtype.txt
@@ -46,6 +48,8 @@ load teardown setup
     echo enp5s0 > extnetif.txt
     echo 192.168.1.1 > extnetip.txt
     echo 12345 > portno.txt
+    echo 10.127.0. > intnetaddress.txt
+    echo fdfc:2965:0503:e2ae:: > intnet6address.txt
     echo 8.8.8.8 > intnetdns.txt
     echo 2001:4860:4860::8888 > intnet6dns.txt
     echo none > fwtype.txt
