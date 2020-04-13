@@ -202,10 +202,10 @@ echo 192.168.1.2 > extnetip.txt
 ```
 
 In case of NAT/PAT/masquarading one can try to use service like
-[ifconfig.me](https://ifconfig.me/) for autodetection:
+[ifconfig.co](https://ifconfig.co/) for autodetection:
 
 ```
-curl ifconfig.me/ip > extnetip.txt
+curl ifconfig.co/ip > extnetip.txt
 ```
 
 ### Disabling random port assignment
