@@ -245,6 +245,7 @@ EOF
 create_hub_conf() {
     echo "No wghub.conf... creating one!"
     cat > wghub.conf << EOF
+# Hub configuration created on $(hostname) on $(date)
 [Interface]
 Address = $INT_NET_HUB_IP$INT_NET_MASK$($NET6 && echo ", $INT_NET6_HUB_IP$INT_NET6_MASK")
 ListenPort = $EXT_NET_PORT
