@@ -219,6 +219,17 @@ file with command:
 echo 80 > portno.txt
 ```
 
+### Disabling randomly generated internal network addresses
+
+By default `easy-wg-quick` use randomly generated internal network addresses
+for both IPv4 and IPv6. Custom network addresses can be set with the following
+commands.
+
+```
+echo "10.1.1."               > intnetaddress.txt   # for IPv4
+echo "fd90:d175:8e43:705d::" > intnet6address.txt  # for IPv6
+```
+
 ### Setting custom DNS
 
 #### Setting IPv4 resolver address
