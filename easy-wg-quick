@@ -179,6 +179,15 @@ get_int_net_dns() {
     cat intnetdns.txt
 }
 
+create_int_net_address() {
+    echo "No intnetaddress.txt... creating one!"
+    echo "10.127.0." > intnetaddress.txt
+}
+
+get_int_net_address() {
+    cat intnetaddress.txt
+}
+
 create_int_net6_dns() {
     echo "No intnet6dns.txt... creating one!"
     echo "2606:4700:4700::1111" > intnet6dns.txt
@@ -186,6 +195,15 @@ create_int_net6_dns() {
 
 get_int_net6_dns() {
     cat intnet6dns.txt
+}
+
+create_int_net6_address() {
+    echo "No intnet6address.txt... creating one!"
+    echo "fdfc:2965:0503:e2ae::" > intnet6address.txt
+}
+
+get_int_net6_address() {
+    cat intnet6address.txt
 }
 
 create_psk() {
@@ -282,7 +300,7 @@ create_new_client_conf() {
     cat > "wgclient_$CONF_NAME.conf" << EOF
 # $SEQNO: $CONF_NAME > wgclient_$CONF_NAME.conf
 [Interface]
-Address = $INT_NET_PEER$SEQNO$INT_NET_MASK$($NET6 && echo ", $INT_NET6_PEER$SEQNO$INT_NET6_MASK")
+Address = $INT_NET_ADDRESS$SEQNO$INT_NET_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$SEQNO$INT_NET6_MASK")
 DNS = $INT_NET_DNS$($NET6 && echo ", $INT_NET6_DNS")
 PrivateKey = $(wg genkey | tee "wgclient_$CONF_NAME.key")
 
@@ -306,7 +324,7 @@ add_client_to_hub_conf() {
 [Peer]
 PublicKey = $(wg pubkey < "wgclient_$CONF_NAME.key")
 PresharedKey = $(cat wgpsk.key)
-AllowedIPs = $INT_NET_PEER$SEQNO$INT_NET_PEER_MASK$($NET6 && echo ", $INT_NET6_PEER$1$INT_NET6_PEER_MASK")
+AllowedIPs = $INT_NET_ADDRESS$SEQNO$INT_NET_ADDRESS_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$1$INT_NET6_ADDRESS_MASK")
 EOF
     echo " done!"
 cat << EOF
@@ -377,13 +395,14 @@ main() {
     EXT_NET_IF="$(get_ext_net_if)"
     test -f extnetip.txt || create_ext_net_ip "$EXT_NET_IF"
     EXT_NET_IP="$(get_ext_net_ip)"
-    INT_NET_HUB_IP="10.127.0.1"
 
     INT_NET_MASK="/24"
     test -f intnetdns.txt || create_int_net_dns
     INT_NET_DNS="$(get_int_net_dns)"
-    INT_NET_PEER="10.127.0."
-    INT_NET_PEER_MASK="/32"
+    test -f intnetaddress.txt  || create_int_net_address
+    INT_NET_ADDRESS="$(get_int_net_address)"
+    INT_NET_ADDRESS_MASK="/32"
+    INT_NET_HUB_IP="${INT_NET_ADDRESS}1"
 
     test -f fwtype.txt || create_fw_type
     FW_TYPE="$(get_fw_type)"
@@ -393,12 +412,13 @@ main() {
     NET6=false
     check_if_ipv6_is_available "$EXT_NET_IF" && {
         NET6=true
-        INT_NET6_HUB_IP="fdfc:2965:0503:e2ae::1"
         INT_NET6_MASK="/64"
         test -f intnet6dns.txt || create_int_net6_dns
         INT_NET6_DNS="$(get_int_net6_dns)"
-        INT_NET6_PEER="fdfc:2965:0503:e2ae::"
-        INT_NET6_PEER_MASK="/128"
+        test -f intnet6address.txt  || create_int_net6_address
+        INT_NET6_ADDRESS="$(get_int_net6_address)"
+        INT_NET6_ADDRESS_MASK="/128"
+        INT_NET6_HUB_IP="${INT_NET6_ADDRESS}1"
     }
 
     check_if_wg_is_installed
