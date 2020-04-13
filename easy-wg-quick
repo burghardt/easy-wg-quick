@@ -181,7 +181,9 @@ get_int_net_dns() {
 
 create_int_net_address() {
     echo "No intnetaddress.txt... creating one!"
-    echo "10.127.0." > intnetaddress.txt
+    RNDNET1="$( (shuf -i 1-250 -n 1 || jot -r 1 1 250) 2>/dev/null)"
+    RNDNET2="$( (shuf -i 1-250 -n 1 || jot -r 1 1 250) 2>/dev/null)"
+    echo "10.${RNDNET1:-127}.${RNDNET2:-0}." > intnetaddress.txt
 }
 
 get_int_net_address() {
@@ -199,7 +201,11 @@ get_int_net6_dns() {
 
 create_int_net6_address() {
     echo "No intnet6address.txt... creating one!"
-    echo "fdfc:2965:0503:e2ae::" > intnet6address.txt
+    RNDGLB1="$( (shuf -i 11-99 -n 1 || jot -r 1 11 99) 2>/dev/null)"
+    RNDGLB2="$( (shuf -i 1111-9999 -n 1 || jot -r 1 1111 9999) 2>/dev/null)"
+    RNDGLB3="$( (shuf -i 1111-9999 -n 1 || jot -r 1 1111 9999) 2>/dev/null)"
+    RNDSUBN="$( (shuf -i 1111-9999 -n 1 || jot -r 1 1111 9999) 2>/dev/null)"
+    echo "fd${RNDGLB1:-fc}:${RNDGLB2:-2965}:${RNDGLB3:-0503}:${RNDSUBN:-e2ae}::" > intnet6address.txt
 }
 
 get_int_net6_address() {
