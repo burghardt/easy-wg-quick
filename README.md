@@ -230,6 +230,20 @@ echo "10.1.1."               > intnetaddress.txt   # for IPv4
 echo "fd90:d175:8e43:705d::" > intnet6address.txt  # for IPv6
 ```
 
+Default masks are /24 for IPv4 and /64 for IPv6.
+
+#### Setting network masks
+
+To change default masks set new masks in files named `intnetmask.txt` (IPv4)
+and `intnet6mask.txt` (IPv6).
+
+```
+echo 172.16.0. > intnetaddress.txt
+echo /16       > intnetmask.txt
+echo fd9d:9648:0841:0c6e:3d28:94d9:: > intnet6address.txt
+echo /112                            > intnet6mask.txt
+```
+
 ### Setting custom DNS
 
 #### Setting IPv4 resolver address
