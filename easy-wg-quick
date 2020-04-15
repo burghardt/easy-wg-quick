@@ -190,6 +190,15 @@ get_int_net_address() {
     cat intnetaddress.txt
 }
 
+create_int_net_mask() {
+    echo "No intnetmask.txt... creating one!"
+    echo "/24" > intnetmask.txt
+}
+
+get_int_net_mask() {
+    cat intnetmask.txt
+}
+
 create_int_net6_dns() {
     echo "No intnet6dns.txt... creating one!"
     echo "2606:4700:4700::1111" > intnet6dns.txt
@@ -210,6 +219,15 @@ create_int_net6_address() {
 
 get_int_net6_address() {
     cat intnet6address.txt
+}
+
+create_int_net6_mask() {
+    echo "No intnet6mask.txt... creating one!"
+    echo "/64" > intnet6mask.txt
+}
+
+get_int_net6_mask() {
+    cat intnet6mask.txt
 }
 
 create_psk() {
@@ -402,10 +420,11 @@ main() {
     test -f extnetip.txt || create_ext_net_ip "$EXT_NET_IF"
     EXT_NET_IP="$(get_ext_net_ip)"
 
-    INT_NET_MASK="/24"
+    test -f intnetmask.txt || create_int_net_mask
+    INT_NET_MASK="$(get_int_net_mask)"
     test -f intnetdns.txt || create_int_net_dns
     INT_NET_DNS="$(get_int_net_dns)"
-    test -f intnetaddress.txt  || create_int_net_address
+    test -f intnetaddress.txt || create_int_net_address
     INT_NET_ADDRESS="$(get_int_net_address)"
     INT_NET_ADDRESS_MASK="/32"
     INT_NET_HUB_IP="${INT_NET_ADDRESS}1"
@@ -418,10 +437,11 @@ main() {
     NET6=false
     check_if_ipv6_is_available "$EXT_NET_IF" && {
         NET6=true
-        INT_NET6_MASK="/64"
+        test -f intnet6mask.txt || create_int_net6_mask
+        INT_NET6_MASK="$(get_int_net6_mask)"
         test -f intnet6dns.txt || create_int_net6_dns
         INT_NET6_DNS="$(get_int_net6_dns)"
-        test -f intnet6address.txt  || create_int_net6_address
+        test -f intnet6address.txt || create_int_net6_address
         INT_NET6_ADDRESS="$(get_int_net6_address)"
         INT_NET6_ADDRESS_MASK="/128"
         INT_NET6_HUB_IP="${INT_NET6_ADDRESS}1"
