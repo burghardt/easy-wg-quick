@@ -328,6 +328,34 @@ To use outer IPv6 addresses (i.e. connect client to hub over IPv6) just set
 `EXT_NET_IF` and `EXT_NET_IP` variables in script to external network interface
 name and IPv6 address (or edit `wghub.conf`).
 
+### Enabling NDP proxy (instead of default IPv6 masquerading)
+
+By default `easy-wg-quick` uses IPv6 masquerading to provide IPv6 connectivity
+to peers. This is easier to setup and require only single IPv6 global unicast
+address to work. On the other hand network address translation (NAT) has
+[issues and limitations](https://en.wikipedia.org/wiki/Network_address_translation#Issues_and_limitations).
+
+[Neighbor Discovery](https://en.wikipedia.org/wiki/Neighbor_Discovery_Protocol)
+[Proxies (ND Proxy, NDP Proxy)](https://tools.ietf.org/html/rfc4389) allows
+[end-to-end connectivity](https://en.wikipedia.org/wiki/End-to-end_principle),
+but requires /64 network to be assigned to hub. From this /64 network,
+a subnetwork has to be divided (i.e. /112) and assigned to Wireguard interface.
+
+To enable proxied NDP create file named `ipv6mode.txt` with `proxy_ndp` string.
+```
+echo proxy_ndp > ipv6mode.txt
+```
+
+When hub has 2001:19f0:6c01:1c0d/64 assigned, part of it can be assigned to
+Wireguard interface (i.e. 2001:19f0:6c01:1c0d:40/112).
+
+```
+echo 2001:19f0:6c01:1c0d:40:: > intnet6address.txt
+echo /112 > intnet6mask.txt
+```
+
+Please note that NDP proxy mode in `easy-wg-quick` is supported only on Linux.
+
 ### Redirecting DNS
 
 DNS redirection might be required to integrate with services like

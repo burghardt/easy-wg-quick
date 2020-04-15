@@ -230,6 +230,15 @@ get_int_net6_mask() {
     cat intnet6mask.txt
 }
 
+create_ipv6_mode() {
+    echo "No ipv6mode.txt... creating one!"
+    echo "masquerade" > ipv6mode.txt
+}
+
+get_ipv6_mode() {
+    cat ipv6mode.txt
+}
+
 create_psk() {
     echo "No wgpsk.key... creating one!"
     wg genpsk > wgpsk.key
@@ -245,16 +254,20 @@ create_iptables_rules() {
 PostUp = iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 PostUp = ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 PostUp = iptables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
-PostUp = ip6tables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostUp = iptables -A FORWARD -i %i -j ACCEPT
 PostUp = ip6tables -A FORWARD -i %i -j ACCEPT
 PostDown = iptables -D FORWARD -i %i -j ACCEPT
 PostDown = ip6tables -D FORWARD -i %i -j ACCEPT
 PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
-PostDown = ip6tables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = iptables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 PostDown = ip6tables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 EOF
+    if test "x$NET6MODE" = "xmasquerade"; then
+        cat << EOF
+PostUp = ip6tables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostDown = ip6tables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+EOF
+    fi
 }
 
 create_sysctl_linux_rules() {
@@ -264,6 +277,12 @@ PostUp = sysctl -q -w net.ipv6.conf.all.forwarding=1
 PostDown = sysctl -q -w net.ipv4.ip_forward=0
 PostDown = sysctl -q -w net.ipv6.conf.all.forwarding=0
 EOF
+    if test "x$NET6MODE" = "xproxy_ndp"; then
+        cat << EOF
+PostUp = sysctl net.ipv6.conf.all.proxy_ndp=1
+PostDown = sysctl net.ipv6.conf.all.proxy_ndp=0
+EOF
+    fi
 }
 
 create_pf_rules() {
@@ -350,6 +369,12 @@ PublicKey = $(wg pubkey < "wgclient_$CONF_NAME.key")
 PresharedKey = $(cat wgpsk.key)
 AllowedIPs = $INT_NET_ADDRESS$SEQNO$INT_NET_ADDRESS_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$1$INT_NET6_ADDRESS_MASK")
 EOF
+    if $NET6 && test "x$NET6MODE" = "xproxy_ndp"; then
+      NEIGHADD="PostUp = ip -6 neigh add proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
+      NEIGHDEL="PostDown = ip -6 neigh del proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
+      sed -ibak "s/.*net.ipv6.conf.all.proxy_ndp=0.*/&\n$NEIGHADD\n$NEIGHDEL/" wghub.conf
+    fi
+
     echo " done!"
 cat << EOF
 
@@ -437,6 +462,8 @@ main() {
     NET6=false
     check_if_ipv6_is_available "$EXT_NET_IF" && {
         NET6=true
+        test -f ipv6mode.txt || create_ipv6_mode
+        NET6MODE="$(get_ipv6_mode)"
         test -f intnet6mask.txt || create_int_net6_mask
         INT_NET6_MASK="$(get_int_net6_mask)"
         test -f intnet6dns.txt || create_int_net6_dns
