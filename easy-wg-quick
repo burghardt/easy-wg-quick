@@ -372,7 +372,7 @@ EOF
     if $NET6 && test "x$NET6MODE" = "xproxy_ndp"; then
       NEIGHADD="PostUp = ip -6 neigh add proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
       NEIGHDEL="PostDown = ip -6 neigh del proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
-      sed -ibak "s/.*net.ipv6.conf.all.proxy_ndp=0.*/&\n$NEIGHADD\n$NEIGHDEL/" wghub.conf
+      sed -i.bak "s/.*net.ipv6.conf.all.proxy_ndp=0.*/&\n$NEIGHADD\n$NEIGHDEL/" wghub.conf
     fi
 
     echo " done!"
