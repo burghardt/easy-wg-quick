@@ -14,7 +14,7 @@ load teardown setup
     [ "${#lines[@]}" -gt 10 ]
     run grep 'ip6tables -t nat -A POSTROUTING' wghub.conf
     [ "$status" -eq 0 ]
-    run grep 'sysctl net.ipv6.conf.all.proxy_ndp=1' wghub.conf
+    run grep 'sysctl -q -w net.ipv6.conf.all.proxy_ndp=1' wghub.conf
     [ "$status" -eq 1 ]
     run grep 'ip -6 neigh add proxy' wghub.conf
     [ "$status" -eq 1 ]
@@ -30,7 +30,7 @@ load teardown setup
     run ../easy-wg-quick
     [ "$status" -eq 0 ]
     [ "${#lines[@]}" -gt 10 ]
-    run grep 'sysctl net.ipv6.conf.all.proxy_ndp=1' wghub.conf
+    run grep 'sysctl -q -w net.ipv6.conf.all.proxy_ndp=1' wghub.conf
     [ "$status" -eq 0 ]
     run grep 'ip -6 neigh add proxy' wghub.conf
     [ "$status" -eq 0 ]
