@@ -279,8 +279,8 @@ PostDown = sysctl -q -w net.ipv6.conf.all.forwarding=0
 EOF
     if test "x$NET6MODE" = "xproxy_ndp"; then
         cat << EOF
-PostUp = sysctl net.ipv6.conf.all.proxy_ndp=1
-PostDown = sysctl net.ipv6.conf.all.proxy_ndp=0
+PostUp = sysctl -q -w net.ipv6.conf.all.proxy_ndp=1
+PostDown = sysctl -q -w net.ipv6.conf.all.proxy_ndp=0
 EOF
     fi
 }
