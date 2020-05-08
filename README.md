@@ -69,6 +69,7 @@ Just download the script and make it executable with `chmod`.
 Note that you can use a short URL as well.
 
     wget https://git.io/fjb5R -O easy-wg-quick
+    chmod +x easy-wg-quick
 
 Or clone repository.
 
