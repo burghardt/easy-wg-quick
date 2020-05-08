@@ -66,7 +66,7 @@ Just download the script and make it executable with `chmod`.
     wget https://raw.githubusercontent.com/burghardt/easy-wg-quick/master/easy-wg-quick
     chmod +x easy-wg-quick
 
-Note: you can use a shorten URL as
+Note that you can use a short URL as well.
 
     wget https://git.io/fjb5R -O easy-wg-quick
 
@@ -158,7 +158,7 @@ On hub configure Wireguard.
 
     sudo wg-quick up ./wghub.conf
 
-On peer scan QR code or copy `wgclient_10.conf`. To repeat that QR code again use
+On peer scan QR code or copy `wgclient_10.conf`. To display QR code again use
 
     qrencode -t ansiutf8 < wgclient_10.conf
 
