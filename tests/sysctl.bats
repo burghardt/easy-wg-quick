@@ -30,7 +30,7 @@ load teardown setup
     run ../easy-wg-quick
     [ "$status" -eq 0 ]
     [ "${#lines[@]}" -gt 10 ]
-    run grep 'sysctl' wghub.conf
+    run grep 'sysctl ' wghub.conf
     [ "$status" -eq 1 ]
     [ "${#lines[@]}" -eq 0 ]
 }
