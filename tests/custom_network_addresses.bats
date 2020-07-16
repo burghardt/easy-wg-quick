@@ -23,8 +23,8 @@ load teardown setup
     [ "${lines[2]}" == "Address = 172.16.1.1/24, fd51:c743:e2fa:dc6f::1/64" ]
     [ "${lines[3]}" == "ListenPort = 12345" ]
     [ "${lines[5]}" == "SaveConfig = false" ]
-    [ "${lines[8]}" == "[Peer]" ]
-    [ "${lines[11]}" == "AllowedIPs = 172.16.1.10/32, fd51:c743:e2fa:dc6f::10/128" ]
+    [ "${lines[9]}" == "[Peer]" ]
+    [ "${lines[12]}" == "AllowedIPs = 172.16.1.10/32, fd51:c743:e2fa:dc6f::10/128" ]
 }
 
 @test "run to create custom networks client configuration" {

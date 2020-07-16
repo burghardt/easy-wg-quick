@@ -257,10 +257,11 @@ Firewall type is guessed from operating system. For Linux `iptables` and
 File `fwtype.txt` contains name of firewall type. To override autodetection
 or disable any rules run one of the following commands:
 
-    echo iptables > fwtype.txt  # to choose Linux netfilter
-    echo pf       > fwtype.txt  # to choose OpenBSD PF
-    echo custom   > fwtype.txt  # to include predefined commands from file
-    echo none     > fwtype.txt  # to skip any setup during wg-quick up/down
+    echo iptables  > fwtype.txt  # to choose Linux netfilter
+    echo firewalld > fwtype.txt  # to choose [firewalld]
+    echo pf        > fwtype.txt  # to choose OpenBSD PF
+    echo custom    > fwtype.txt  # to include predefined commands from file
+    echo none      > fwtype.txt  # to skip any setup during wg-quick up/down
 
 If `fwtype.txt` contains word `custom` content of `commands.txt` is included
 in the `wghub.conf` file.
@@ -379,6 +380,7 @@ OpenVPN's [easy-rsa] was an inspiration for writing this script.
 [iOS]: https://itunes.apple.com/us/app/wireguard/id1441195209?ls=1&mt=8
 [air gapped]: https://en.wikipedia.org/wiki/Air_gap_%28networking%29
 [ifconfig.co]: https://ifconfig.co/
+[firewalld]: https://firewalld.org/
 [Docker]: https://success.docker.com/article/ipv4-forwarding
 [elsewhere]: https://en.wikipedia.org/wiki/Sysctl
 [issues and limitations]: https://en.wikipedia.org/wiki/Network_address_translation#Issues_and_limitations

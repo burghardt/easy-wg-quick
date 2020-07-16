@@ -38,10 +38,10 @@ load teardown setup
     [ "${lines[3]}" == "ListenPort = 12345" ]
     [ "${lines[4]}" == "PrivateKey = aFj9NLLBci/8xWCErHBHQ+Lz3eNrJZ5VlfW1dDEpxH8=" ]
     [ "${lines[5]}" == "SaveConfig = false" ]
-    [ "${lines[8]}" == "[Peer]" ]
-    [ "${lines[9]}" == "PublicKey = a+4ANyG+HEgiUqYeQI4dsOvlg4FCK64IcLZgMmkjnyE=" ]
-    [ "${lines[10]}" == "PresharedKey = qRF8FZ3bPrvfEy0F1+K4/J8ySS4yKFjV6WdSvKBs4Oo=" ]
-    [ "${lines[11]}" == "AllowedIPs = 10.127.0.10/32, fdfc:2965:0503:e2ae::10/128" ]
+    [ "${lines[9]}" == "[Peer]" ]
+    [ "${lines[10]}" == "PublicKey = a+4ANyG+HEgiUqYeQI4dsOvlg4FCK64IcLZgMmkjnyE=" ]
+    [ "${lines[11]}" == "PresharedKey = qRF8FZ3bPrvfEy0F1+K4/J8ySS4yKFjV6WdSvKBs4Oo=" ]
+    [ "${lines[12]}" == "AllowedIPs = 10.127.0.10/32, fdfc:2965:0503:e2ae::10/128" ]
 }
 
 @test "run to create basic stable client configuration" {

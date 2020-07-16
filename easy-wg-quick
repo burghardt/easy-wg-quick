@@ -270,6 +270,15 @@ EOF
     fi
 }
 
+create_firewalld_rules() {
+    cat << EOF
+PostUp = firewall-cmd --zone=public --add-port $EXT_NET_PORT/udp
+PostUp = firewall-cmd --zone=public --add-masquerade
+PostDown = firewall-cmd --zone=public --remove-port $EXT_NET_PORT/udp
+PostDown = firewall-cmd --zone=public --remove-masquerade
+EOF
+}
+
 create_sysctl_linux_rules() {
     cat << EOF
 PostUp = sysctl -q -w net.ipv4.ip_forward=1
@@ -316,19 +325,23 @@ EOF
 
     if test "x$FW_TYPE" = "xiptables"; then
         create_iptables_rules >> wghub.conf
-        if test "x$SYSCTL_TYPE" = "xlinux"; then
-            create_sysctl_linux_rules >> wghub.conf
-        fi
+    elif test "x$FW_TYPE" = "xfirewalld"; then
+        create_firewalld_rules >> wghub.conf
     elif test "x$FW_TYPE" = "xpf"; then
         create_pf_rules >> wghub.conf
-        if test "x$SYSCTL_TYPE" = "xfreebsd"; then
-            create_sysctl_freebsd_rules >> wghub.conf
-        fi
     elif test "x$FW_TYPE" = "xcustom"; then
         echo '# Custom PostUp / PostDown commands from commands.txt' >> wghub.conf
         cat commands.txt >> wghub.conf
     elif test "x$FW_TYPE" = "xnone"; then
-        echo '# PostUp / PostDown commands disabled with "none" set in fwtype.txt' >> wghub.conf
+        echo '# Firewall PostUp / PostDown commands disabled with "none" set in fwtype.txt' >> wghub.conf
+    fi
+
+    if test "x$SYSCTL_TYPE" = "xlinux"; then
+        create_sysctl_linux_rules >> wghub.conf
+    elif test "x$SYSCTL_TYPE" = "xfreebsd"; then
+        create_sysctl_freebsd_rules >> wghub.conf
+    elif test "x$SYSCTL_TYPE" = "xnone"; then
+        echo '# Sysctl PostUp / PostDown commands disabled with "none" set in sysctltype.txt' >> wghub.conf
     fi
 
     echo "Wireguard hub address is $EXT_NET_IP:$EXT_NET_PORT on $EXT_NET_IF."

@@ -12,6 +12,21 @@ load teardown setup
     [ "$output" == "PostUp = iptables -A FORWARD -i %i -j ACCEPT" ]
 }
 
+@test "run with firewall type set to firewalld" {
+    echo firewalld > fwtype.txt
+    echo 31337 > portno.txt
+    run ../easy-wg-quick
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 10 ]
+    run grep 'firewall-cmd --zone=public' wghub.conf
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -eq 4 ]
+    [ "${lines[0]}" == "PostUp = firewall-cmd --zone=public --add-port 31337/udp" ]
+    [ "${lines[1]}" == "PostUp = firewall-cmd --zone=public --add-masquerade" ]
+    [ "${lines[2]}" == "PostDown = firewall-cmd --zone=public --remove-port 31337/udp" ]
+    [ "${lines[3]}" == "PostDown = firewall-cmd --zone=public --remove-masquerade" ]
+}
+
 @test "run with firewall type set to OpenBSD PF" {
     echo pf > fwtype.txt
     run ../easy-wg-quick
