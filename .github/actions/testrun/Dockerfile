@@ -12,9 +12,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         iproute2 \
         qrencode \
-        software-properties-common && \
-    add-apt-repository --yes ppa:wireguard/wireguard && \
-    apt-get install -y --no-install-recommends wireguard-tools && \
+        wireguard-tools && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
