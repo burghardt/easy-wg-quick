@@ -406,6 +406,7 @@ print_client_conf() {
 
 print_client_qrcode() {
     qrencode -t ansiutf8 < "wgclient_$1.conf"
+    cat wgclient_$1.conf | qrencode -s 8 -o ./wgclient_$1.png
     echo "Scan QR code with your phone or use \"wgclient_$1.conf\" file."
 }
 
