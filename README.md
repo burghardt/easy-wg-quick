@@ -7,7 +7,7 @@ easy-wg-quick - Creates Wireguard configuration for hub and peers with ease
  * [Usage](#usage)
    * [Sample output](#sample-output)
    * [Using generated configuration](#using-generated-configuration)
- * [Fine tunning](#fine-tunning)
+ * [Fine tuning](#fine-tuning)
    * [Disabling external interface autodetection](#disabling-external-interface-autodetection)
    * [Disabling external IP address autodetection](#disabling-external-ip-address-autodetection)
    * [Disabling random port assignment](#disabling-random-port-assignment)
@@ -179,7 +179,7 @@ peer: th8qYu0R0mgio2wPu1kz6/5OOgi6l8iy7OobK590LHw=
   transfer: 32.64 MiB received, 95.24 MiB sent
 ```
 
-## Fine tunning
+## Fine tuning
 
 ### Disabling external interface autodetection
 
