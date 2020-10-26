@@ -75,6 +75,15 @@ get_ext_net_ip() {
     cat extnetip.txt
 }
 
+create_client_allowedips() {
+    echo "No intnetallowedips.txt... creating one!"
+    echo "0.0.0.0/0, ::/0" > intnetallowedips.txt
+}
+
+get_client_allowedips() {
+    cat intnetallowedips.txt
+}
+
 detect_fw_type() {
     if test "x$(uname -s)" = "xFreeBSD"; then
         echo "pf"
@@ -363,7 +372,7 @@ PrivateKey = $(wg genkey | tee "wgclient_$CONF_NAME.key")
 [Peer]
 PublicKey = $(wg pubkey < wghub.key)
 PresharedKey = $(cat wgpsk.key)
-AllowedIPs = 0.0.0.0/0, ::/0
+AllowedIPs = $INT_NET_CLINET_ALLOWEDIPS
 Endpoint = $EXT_NET_IP:$EXT_NET_PORT
 PersistentKeepalive = 25
 EOF
@@ -466,6 +475,8 @@ main() {
     INT_NET_ADDRESS="$(get_int_net_address)"
     INT_NET_ADDRESS_MASK="/32"
     INT_NET_HUB_IP="${INT_NET_ADDRESS}1"
+    test -f intnetallowedips.txt || create_client_allowedips
+    INT_NET_CLINET_ALLOWEDIPS="$(get_client_allowedips)"
 
     test -f fwtype.txt || create_fw_type
     FW_TYPE="$(get_fw_type)"
