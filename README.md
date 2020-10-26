@@ -13,6 +13,7 @@ easy-wg-quick - Creates Wireguard configuration for hub and peers with ease
    * [Disabling random port assignment](#disabling-random-port-assignment)
    * [Disabling randomly generated internal network addresses](#disabling-randomly-generated-internal-network-addresses)
    * [Setting custom DNS](#setting-custom-dns)
+   * [Setting custom client's `AllowedIPs`](#setting-custom-clients-allowedips)
    * [Choosing firewall type](#choosing-firewall-type)
    * [Choosing if PostUp/PostDown should enable/disable IP forwarding](#choosing-if-postuppostdown-should-enabledisable-ip-forwarding)
    * [Enabling IPv6](#enabling-ipv6)
@@ -250,6 +251,15 @@ can use the command below to serve a custom IPv6 DNS to clients.
 
     echo 2001:4860:4860::8888 > intnet6dns.txt
 
+### Setting custom client's `AllowedIPs`
+
+By default, the client's `AllowedIPs` variable is set to `0.0.0.0/0, ::/0`,
+directing the whole client's traffic through the VPN connection. If you want
+to create a VPN [split tunneling] configuration, store required IP addresses
+ranges in the `intnetallowedips.txt` file:
+
+    echo '172.16.1.0/24, 172.16.2.0/24' > intnetallowedips.txt
+
 ### Choosing firewall type
 
 Firewall type is guessed from operating system. For Linux `iptables` and
@@ -380,6 +390,7 @@ OpenVPN's [easy-rsa] was an inspiration for writing this script.
 [iOS]: https://itunes.apple.com/us/app/wireguard/id1441195209?ls=1&mt=8
 [air gapped]: https://en.wikipedia.org/wiki/Air_gap_%28networking%29
 [ifconfig.co]: https://ifconfig.co/
+[split tunneling]: https://en.wikipedia.org/wiki/Split_tunneling
 [firewalld]: https://firewalld.org/
 [Docker]: https://success.docker.com/article/ipv4-forwarding
 [elsewhere]: https://en.wikipedia.org/wiki/Sysctl
