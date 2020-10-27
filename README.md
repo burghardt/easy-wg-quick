@@ -59,6 +59,7 @@ This script requires only tools installed, but to use Wireguard module
 for various operating systems is available at [wireguard.com/install].
 
 Peers also requires Wireguard installed. [Android] and [iOS] are supported.
+[OpenWRT clients] are supported with [UCI] configuration fragments.
 
 ### Installing
 
@@ -163,6 +164,16 @@ On hub configure Wireguard.
 On peer scan QR code or copy `wgclient_10.conf`. To display QR code again use
 
     qrencode -t ansiutf8 < wgclient_10.conf
+
+Or use saved QR code
+
+    cat wgclient_10.qrcode.txt
+
+To connect the whole network with a single Wireguard client running on an
+[OpenWRT] router, append generated [UCI] client configuration fragment to
+your router `/etc/config/network` file.
+
+    cat wgclient_10.uci.txt
 
 Finally on hub check if everything works with `sudo wg show`.
 
@@ -388,6 +399,9 @@ OpenVPN's [easy-rsa] was an inspiration for writing this script.
 [wireguard.com/install]: https://www.wireguard.com/install/
 [Android]: https://play.google.com/store/apps/details?id=com.wireguard.android
 [iOS]: https://itunes.apple.com/us/app/wireguard/id1441195209?ls=1&mt=8
+[OpenWRT clients]: https://openwrt.org/docs/guide-user/services/vpn/wireguard/client
+[UCI]: https://openwrt.org/docs/techref/uci
+[OpenWRT]: https://openwrt.org/
 [air gapped]: https://en.wikipedia.org/wiki/Air_gap_%28networking%29
 [ifconfig.co]: https://ifconfig.co/
 [split tunneling]: https://en.wikipedia.org/wiki/Split_tunneling
