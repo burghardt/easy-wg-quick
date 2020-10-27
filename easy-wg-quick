@@ -357,7 +357,7 @@ EOF
     echo "Note: customize [Interface] section of wghub.conf if required!"
 }
 
-create_new_client_conf() {
+create_new_client_conf_wg_quick() {
     SEQNO="$1"
     CONF_NAME="$2"
 
@@ -376,6 +376,46 @@ AllowedIPs = $INT_NET_CLINET_ALLOWEDIPS
 Endpoint = $EXT_NET_IP:$EXT_NET_PORT
 PersistentKeepalive = 25
 EOF
+}
+
+allowedips_to_uci_list() {
+    ALLOWEDIPS="$1"
+
+    for IPRANGE in $(echo "$ALLOWEDIPS" | tr "," " "); do
+        echo "	option allowed_ips '$IPRANGE'"
+    done
+}
+
+create_new_client_conf_uci() {
+    SEQNO="$1"
+    CONF_NAME="$2"
+
+    echo "No wgclient_$CONF_NAME.uci.txt... creating one!"
+    cat > "wgclient_$CONF_NAME.uci.txt" << EOF
+# $SEQNO: $CONF_NAME > wgclient_$CONF_NAME.uci.txt
+config interface 'wg0'
+	option proto 'wireguard'
+	option listen_port '$EXT_NET_PORT'
+	list addresses '$INT_NET_ADDRESS$SEQNO$INT_NET_MASK'
+$($NET6 && echo "	list addresses '$INT_NET6_ADDRESS$SEQNO$INT_NET6_MASK'")
+	list dns '$INT_NET_DNS'
+$($NET6 && echo "	list dns '$INT_NET6_DNS'")
+	option private_key '$(cat "wgclient_$CONF_NAME.key")'
+
+config wireguard_wg0
+$(allowedips_to_uci_list "$INT_NET_CLINET_ALLOWEDIPS")
+	option route_allowed_ips '1'
+	option endpoint_host '$EXT_NET_IP'
+	option endpoint_port '$EXT_NET_PORT'
+	option persistent_keepalive '25'
+	option public_key '$(wg pubkey < wghub.key)'
+	option preshared_key '$(cat wgpsk.key)'
+EOF
+}
+
+create_new_client_conf() {
+    create_new_client_conf_wg_quick "$SEQNO" "$CONF_NAME"
+    create_new_client_conf_uci "$SEQNO" "$CONF_NAME"
 }
 
 add_client_to_hub_conf() {
