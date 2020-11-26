@@ -395,7 +395,6 @@ create_new_client_conf_uci() {
 # $SEQNO: $CONF_NAME > wgclient_$CONF_NAME.uci.txt
 config interface 'wg0'
 	option proto 'wireguard'
-	option listen_port '$EXT_NET_PORT'
 	list addresses '$INT_NET_ADDRESS$SEQNO$INT_NET_MASK'
 $($NET6 && echo "	list addresses '$INT_NET6_ADDRESS$SEQNO$INT_NET6_MASK'")
 	list dns '$INT_NET_DNS'
