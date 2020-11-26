@@ -382,7 +382,7 @@ allowedips_to_uci_list() {
     ALLOWEDIPS="$1"
 
     for IPRANGE in $(echo "$ALLOWEDIPS" | tr "," " "); do
-        echo "	option allowed_ips '$IPRANGE'"
+        echo "	list allowed_ips '$IPRANGE'"
     done
 }
 
