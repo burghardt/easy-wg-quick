@@ -35,7 +35,7 @@ detect_ext_net_if() {
     if test "x$(uname -s)" = "xFreeBSD"; then
         route get default | awk '$1 == "interface:" { print $2 }'
     elif test "x$(uname -s)" = "xLinux"; then
-        ip route sh | awk '$1 == "default" { print $5 }'
+        ip route sh | awk '$1 == "default" && $2 == "via" { print $5; exit }'
     fi
 }
 
