@@ -3,7 +3,6 @@
 load teardown setup
 
 @test "run to check key usage in UCI" {
-    skip
     echo none > fwtype.txt
     echo none > sysctltype.txt
     run ../easy-wg-quick test_keys
@@ -12,7 +11,7 @@ load teardown setup
     run cat wgclient_test_keys.uci.txt
     [ "$status" -eq 0 ]
     [ "${#lines[@]}" -gt 15 ]
-    [ "${lines[8]}" == "	option private_key 'aFj9NLLBci/8xWCErHBHQ+Lz3eNrJZ5VlfW1dDEpxH8='" ]
+    [ "${lines[7]}" == "	option private_key 'aFj9NLLBci/8xWCErHBHQ+Lz3eNrJZ5VlfW1dDEpxH8='" ]
     [ "${lines[16]}" == "	option public_key 'a+4ANyG+HEgiUqYeQI4dsOvlg4FCK64IcLZgMmkjnyE='" ]
     [ "${lines[17]}" == "	option preshared_key 'qRF8FZ3bPrvfEy0F1+K4/J8ySS4yKFjV6WdSvKBs4Oo='" ]
 }
