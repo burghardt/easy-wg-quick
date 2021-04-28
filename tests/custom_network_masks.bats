@@ -18,8 +18,8 @@ load teardown setup
     [ "${#lines[@]}" -gt 10 ]
     [ "${lines[1]}" == "[Interface]" ]
     [ "${lines[2]}" == "Address = 172.16.0.1/16, fd9d:9648:0841:0c6e:3d28:94d9::1/112" ]
-    [ "${lines[9]}" == "[Peer]" ]
-    [ "${lines[12]}" == "AllowedIPs = 172.16.0.10/32, fd9d:9648:0841:0c6e:3d28:94d9::10/128" ]
+    [ "${lines[10]}" == "[Peer]" ]
+    [ "${lines[13]}" == "AllowedIPs = 172.16.0.10/32, fd9d:9648:0841:0c6e:3d28:94d9::10/128" ]
 }
 
 @test "run to create networks with custom masks for client configuration" {
