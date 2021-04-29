@@ -199,6 +199,15 @@ get_int_net_address() {
     cat intnetaddress.txt
 }
 
+create_int_net_mtu() {
+    echo "No intnetmtu.txt... creating one!"
+    echo "1280" > intnetmtu.txt
+}
+
+get_int_net_mtu() {
+    cat intnetmtu.txt
+}
+
 create_int_net_mask() {
     echo "No intnetmask.txt... creating one!"
     echo "/24" > intnetmask.txt
@@ -330,6 +339,7 @@ Address = $INT_NET_HUB_IP$INT_NET_MASK$($NET6 && echo ", $INT_NET6_HUB_IP$INT_NE
 ListenPort = $EXT_NET_PORT
 PrivateKey = $(cat wghub.key)
 SaveConfig = false
+MTU = $INT_NET_MTU
 EOF
 
     if test "x$FW_TYPE" = "xiptables"; then
@@ -368,6 +378,7 @@ create_new_client_conf_wg_quick() {
 Address = $INT_NET_ADDRESS$SEQNO$INT_NET_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$SEQNO$INT_NET6_MASK")
 DNS = $INT_NET_DNS$($NET6 && echo ", $INT_NET6_DNS")
 PrivateKey = $(wg genkey | tee "wgclient_$CONF_NAME.key")
+MTU = $INT_NET_MTU
 
 [Peer]
 PublicKey = $(wg pubkey < wghub.key)
@@ -400,6 +411,7 @@ $($NET6 && echo "	list addresses '$INT_NET6_ADDRESS$SEQNO$INT_NET6_MASK'")
 	list dns '$INT_NET_DNS'
 $($NET6 && echo "	list dns '$INT_NET6_DNS'")
 	option private_key '$(cat "wgclient_$CONF_NAME.key")'
+	option mtu '$INT_NET_MTU'
 
 config wireguard_wg0
 $(allowedips_to_uci_list "$INT_NET_CLINET_ALLOWEDIPS")
@@ -506,6 +518,13 @@ main() {
     test -f extnetip.txt || create_ext_net_ip "$EXT_NET_IF"
     EXT_NET_IP="$(get_ext_net_ip)"
 
+    test -f intnetmtu.txt || create_int_net_mtu
+    INT_NET_MTU="$(get_int_net_mtu)"
+    if test "$INT_NET_MTU" -lt 1280 || test "$INT_NET_MTU" -gt 1420; then
+        echo 'MTU should be set between 1280 and 1420 bytes.'
+        echo 'Set it manually in intnetmtu.txt file and start script again.'
+        exit 1
+    fi
     test -f intnetmask.txt || create_int_net_mask
     INT_NET_MASK="$(get_int_net_mask)"
     test -f intnetdns.txt || create_int_net_dns

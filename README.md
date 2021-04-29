@@ -12,6 +12,7 @@ easy-wg-quick - Creates Wireguard configuration for hub and peers with ease
    * [Disabling external IP address autodetection](#disabling-external-ip-address-autodetection)
    * [Disabling random port assignment](#disabling-random-port-assignment)
    * [Disabling randomly generated internal network addresses](#disabling-randomly-generated-internal-network-addresses)
+   * [Setting interface's maximum transmission unit (MTU) size](#setting-interfaces-maximum-transmission-unit-mtu-size)
    * [Setting custom DNS](#setting-custom-dns)
    * [Setting custom client's `AllowedIPs`](#setting-custom-clients-allowedips)
    * [Choosing firewall type](#choosing-firewall-type)
@@ -245,6 +246,14 @@ and `intnet6mask.txt` (IPv6).
     echo /16       > intnetmask.txt
     echo fd9d:9648:0841:0c6e:3d28:94d9:: > intnet6address.txt
     echo /112                            > intnet6mask.txt
+
+### Setting interface's maximum transmission unit (MTU) size
+
+To change the default interface's maximum transmission unit (MTU) size of 1280
+bytes, write a new value into the file named `intnetmtu.txt`. Wireguard MTU
+should be between 1280 and 1420 bytes.
+
+    echo 1380 > intnetmtu.txt
 
 ### Setting custom DNS
 
