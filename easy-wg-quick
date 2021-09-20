@@ -32,9 +32,9 @@ check_if_wg_is_installed() {
 }
 
 detect_ext_net_if() {
-    if test "x$(uname -s)" = "xFreeBSD"; then
+    if test "$(uname -s)" = "FreeBSD"; then
         route get default | awk '$1 == "interface:" { print $2 }'
-    elif test "x$(uname -s)" = "xLinux"; then
+    elif test "$(uname -s)" = "Linux"; then
         ip route sh | awk '$1 == "default" && $2 == "via" { print $5; exit }'
     fi
 }
@@ -54,9 +54,9 @@ get_ext_net_if() {
 }
 
 detect_ext_net_ip() {
-    if test "x$(uname -s)" = "xFreeBSD"; then
+    if test "$(uname -s)" = "FreeBSD"; then
         ifconfig "$1" | awk '$1 == "inet" { print $2 }'
-    elif test "x$(uname -s)" = "xLinux"; then
+    elif test "$(uname -s)" = "Linux"; then
         ip addr sh "$1" | grep 'inet ' | xargs | awk -F'[ /]' '{ print $2 }'
     fi
 }
@@ -85,9 +85,9 @@ get_client_allowedips() {
 }
 
 detect_fw_type() {
-    if test "x$(uname -s)" = "xFreeBSD"; then
+    if test "$(uname -s)" = "FreeBSD"; then
         echo "pf"
-    elif test "x$(uname -s)" = "xLinux"; then
+    elif test "$(uname -s)" = "Linux"; then
         echo "iptables"
     fi
 }
@@ -107,9 +107,9 @@ get_fw_type() {
 }
 
 detect_sysctl_type() {
-    if test "x$(uname -s)" = "xFreeBSD"; then
+    if test "$(uname -s)" = "FreeBSD"; then
         echo "freebsd"
-    elif test "x$(uname -s)" = "xLinux"; then
+    elif test "$(uname -s)" = "Linux"; then
         echo "linux"
     fi
 }
@@ -132,13 +132,13 @@ check_if_ipv6_is_available() {
     if test -f forceipv6.txt; then
         echo 'File forceipv6.txt exists. Enabling IPv6 in tunnels!'
         return  0
-    elif test "x$(uname -s)" = "xFreeBSD"; then
+    elif test "$(uname -s)" = "FreeBSD"; then
         IPV6ADR=$(ifconfig "$1" | awk '$1 == "inet6" { print $2 }' | grep -v "%$1$")
         test -n "$IPV6ADR" && {
             echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
             return  0
         }
-    elif test "x$(uname -s)" = "xLinux"; then
+    elif test "$(uname -s)" = "Linux"; then
         ip -6 addr | grep -i 'scope global' >/dev/null 2>&1 && {
             echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
             return  0
@@ -280,7 +280,7 @@ PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = iptables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 PostDown = ip6tables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
 EOF
-    if test "x$NET6MODE" = "xmasquerade"; then
+    if test "$NET6MODE" = "masquerade"; then
         cat << EOF
 PostUp = ip6tables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = ip6tables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
@@ -304,7 +304,7 @@ PostUp = sysctl -q -w net.ipv6.conf.all.forwarding=1
 PostDown = sysctl -q -w net.ipv4.ip_forward=0
 PostDown = sysctl -q -w net.ipv6.conf.all.forwarding=0
 EOF
-    if test "x$NET6MODE" = "xproxy_ndp"; then
+    if test "$NET6MODE" = "proxy_ndp"; then
         cat << EOF
 PostUp = sysctl -q -w net.ipv6.conf.all.proxy_ndp=1
 PostDown = sysctl -q -w net.ipv6.conf.all.proxy_ndp=0
@@ -342,24 +342,24 @@ SaveConfig = false
 MTU = $INT_NET_MTU
 EOF
 
-    if test "x$FW_TYPE" = "xiptables"; then
+    if test "$FW_TYPE" = "iptables"; then
         create_iptables_rules >> wghub.conf
-    elif test "x$FW_TYPE" = "xfirewalld"; then
+    elif test "$FW_TYPE" = "firewalld"; then
         create_firewalld_rules >> wghub.conf
-    elif test "x$FW_TYPE" = "xpf"; then
+    elif test "$FW_TYPE" = "pf"; then
         create_pf_rules >> wghub.conf
-    elif test "x$FW_TYPE" = "xcustom"; then
+    elif test "$FW_TYPE" = "custom"; then
         echo '# Custom PostUp / PostDown commands from commands.txt' >> wghub.conf
         cat commands.txt >> wghub.conf
-    elif test "x$FW_TYPE" = "xnone"; then
+    elif test "$FW_TYPE" = "none"; then
         echo '# Firewall PostUp / PostDown commands disabled with "none" set in fwtype.txt' >> wghub.conf
     fi
 
-    if test "x$SYSCTL_TYPE" = "xlinux"; then
+    if test "$SYSCTL_TYPE" = "linux"; then
         create_sysctl_linux_rules >> wghub.conf
-    elif test "x$SYSCTL_TYPE" = "xfreebsd"; then
+    elif test "$SYSCTL_TYPE" = "freebsd"; then
         create_sysctl_freebsd_rules >> wghub.conf
-    elif test "x$SYSCTL_TYPE" = "xnone"; then
+    elif test "$SYSCTL_TYPE" = "none"; then
         echo '# Sysctl PostUp / PostDown commands disabled with "none" set in sysctltype.txt' >> wghub.conf
     fi
 
@@ -442,7 +442,7 @@ PublicKey = $(wg pubkey < "wgclient_$CONF_NAME.key")
 PresharedKey = $(cat wgpsk.key)
 AllowedIPs = $INT_NET_ADDRESS$SEQNO$INT_NET_ADDRESS_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$1$INT_NET6_ADDRESS_MASK")
 EOF
-    if $NET6 && test "x$NET6MODE" = "xproxy_ndp"; then
+    if $NET6 && test "$NET6MODE" = "proxy_ndp"; then
       NEIGHADD="PostUp = ip -6 neigh add proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
       NEIGHDEL="PostDown = ip -6 neigh del proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
       sed -i.bak "s/.*net.ipv6.conf.all.proxy_ndp=0.*/&\n$NEIGHADD\n$NEIGHDEL/" wghub.conf
