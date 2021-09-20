@@ -2,5 +2,5 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-env PATH=".:/usr/local/libexec/bats-core:$PATH" \
+env PATH=".:$PATH:/usr/local/libexec/bats-core" \
     bats --tap .
