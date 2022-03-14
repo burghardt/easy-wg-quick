@@ -1,5 +1,5 @@
 #!/bin/sh
-# easy-wg-quick - Creates Wireguard configuration for hub and peers with ease
+# $0 - Creates Wireguard configuration for hub and peers with ease
 # Copyright (C) 2019, 2020 Krzysztof Burghardt <krzysztof@burghardt.pl>
 #
 #
@@ -460,13 +460,13 @@ EOF
 
 print_client_conf() {
     echo "-----BEGIN CONFIG-----"
-    cat "wgclient_$1.conf"
+    cat "wgclient_$2.conf"
     echo "-----END CONFIG-----"
 }
 
 print_client_qrcode() {
-    qrencode -t ansiutf8 < "wgclient_$1.conf" | tee "wgclient_$1.qrcode.txt"
-    echo "Scan QR code with your phone or use \"wgclient_$1.conf\" file."
+    qrencode -t ansiutf8 < "wgclient_$2.conf" | tee "wgclient_$2.qrcode.txt"
+    echo "Scan QR code with your phone or use \"wgclient_$2.conf\" file."
 }
 
 remove_temporary_client_key_file() {
@@ -508,11 +508,8 @@ create_new_client() {
     remove_temporary_client_key_file "$CONF_NAME"
 }
 
-main() {
+easy_wg_quick_init() {
     umask 077
-
-    CONF_NAME="$1"
-
     test -f extnetif.txt || create_ext_net_if
     EXT_NET_IF="$(get_ext_net_if)"
     test -f extnetip.txt || create_ext_net_ip "$EXT_NET_IF"
@@ -558,12 +555,27 @@ main() {
 
     check_if_wg_is_installed
     test -f seqno.txt  || create_seq_no
-    SEQNO="$(get_seq_no)"
     test -f portno.txt || create_port_no
-    EXT_NET_PORT="$(get_port_no)"
     test -f wgpsk.key  || create_psk
     test -f wghub.key  || create_hub_key
     test -f wghub.conf || create_hub_conf
+    if [[ "$1" != "auto" ]]; then
+        echo "Initial configuration completed!  Please check the values in the generated .txt files before creating a client."
+    fi
+}
+
+handholding() {
+    umask 077
+
+    easy_wg_quick_init
+    easy_wg_genclient
+}
+
+easy_wg_genclient() {
+    CONF_NAME="$2"
+
+    SEQNO="$(get_seq_no)"
+    EXT_NET_PORT="$(get_port_no)"
 
     if test -z "$CONF_NAME"; then
         CONF_NAME="$SEQNO"
@@ -573,6 +585,38 @@ main() {
     if check_conf_name_is_available "$CONF_NAME"; then
         create_new_client "$SEQNO" "$CONF_NAME"
     fi
+
+    exit 0
 }
 
-main "$1"
+easy_wg_printclient() {
+    print_client_conf "$@"
+    print_client_qrcode "$@"
+}
+
+easy_wg_usage() {
+    echo "To generate an initial config please run '$0 init'."
+    echo
+    echo "To get a basic configuration that will work for most people, please run '$0 auto'."
+    echo
+    echo "If you have a name for your preferred client but want auto mode, run '$0 auto <client name>'."
+    echo
+    echo "If you already have a configuration and want to generate a new client, run '$0 genclient <client name>'."
+    echo
+    echo "To view the configs and QR codes for a client, run '$0 viewclient <client name>'."
+}
+
+main() {
+    case $1 in
+        "init") easy_wg_quick_init ;;
+        "auto") handholding "$@" ;;
+        "viewclient") easy_wg_printclient "$@" ;;
+        "help") easy_wg_usage ;;
+        "-h") easy_wg_usage ;;
+        "--help") easy_wg_usage ;;
+        *) easy_wg_usage ;;
+    esac
+}
+
+main "$@"
+
