@@ -20,6 +20,7 @@ easy-wg-quick - Creates Wireguard configuration for hub and peers with ease
    * [Enabling IPv6](#enabling-ipv6)
    * [Enabling NDP proxy (instead of default IPv6 masquerading)](#enabling-ndp-proxy-instead-of-default-ipv6-masquerading)
    * [Redirecting DNS](#redirecting-dns)
+   * [Traffic control](#traffic-control)
    * [Persisting configuration with systemd](#persisting-configuration-with-systemd)
  * [License](#license)
  * [Acknowledgments](#acknowledgments)
@@ -378,6 +379,19 @@ When using IPv6 similar rules should be set independently with `ip6tables`.
     PostUp = ip6tables -t nat -A PREROUTING -i %i -p tcp -m tcp --dport 53 -j DNAT --to-destination 2606:4700:4700::1111:53
     PostDown = ip6tables -t nat -D PREROUTING -i %i -p udp -m udp --dport 53 -j DNAT --to-destination 2606:4700:4700::1111:53
     PostDown = ip6tables -t nat -D PREROUTING -i %i -p tcp -m tcp --dport 53 -j DNAT --to-destination 2606:4700:4700::1111:53
+
+### Traffic control
+
+Clients can benefit from setting traffic control rules in the  `wghub.conf`.
+For example, setting an SFQ scheduler on the Linux hub is the simplest way to
+ensure the fairness of the download so that each flow can send data in turn,
+thus preventing any single client from drowning out the rest. In addition,
+SFQ will prevent increased latency and latency spikes (aka bufferbloat) during
+high bandwidth consumption.
+
+    PostUp = tc qdisc add dev %i root sfq perturb 10
+
+On Linux clients setting the same should improve the fairness of upload flows.
 
 ### Persisting configuration with systemd
 
