@@ -98,7 +98,6 @@ Following command will create `wgclient_client_name.conf` file.
 
 ```
 No seqno.txt... creating one!
-No wgpsk.key... creating one!
 No wghub.key... creating one!
 No wghub.conf... creating one!
 Wireguard hub address is 10.13.1.140:51820 on wlp9s0.
