@@ -3,9 +3,9 @@ test_task:
   name: FreeBSD test run
   freebsd_instance:
     matrix:
+      image_family: freebsd-13-1
       image_family: freebsd-13-0
-      image_family: freebsd-12-2
-      image_family: freebsd-11-4
+      image_family: freebsd-12-3
   env:
     CIRRUS_CLONE_DEPTH: 10
   pkginstall_script:
