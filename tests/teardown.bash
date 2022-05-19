@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
 teardown() {
-    rm -f ./*.bak ./*.conf ./*.key ./*.txt
+    rm -f ./*.bak ./*.conf ./*.key ./*.psk ./*.txt
 }

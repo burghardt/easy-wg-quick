@@ -1,4 +1,5 @@
 *.bak
 *.conf
 *.key
+*.psk
 *.txt

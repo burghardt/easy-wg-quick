@@ -257,11 +257,6 @@ get_ipv6_mode() {
     cat ipv6mode.txt
 }
 
-create_psk() {
-    echo "No wgpsk.key... creating one!"
-    wg genpsk > wgpsk.key
-}
-
 create_hub_key() {
     echo "No wghub.key... creating one!"
     wg genkey > wghub.key
@@ -382,7 +377,7 @@ MTU = $INT_NET_MTU
 
 [Peer]
 PublicKey = $(wg pubkey < wghub.key)
-PresharedKey = $(cat wgpsk.key)
+PresharedKey = $(wg genpsk | tee "wgclient_$CONF_NAME.psk")
 AllowedIPs = $INT_NET_CLINET_ALLOWEDIPS
 Endpoint = $EXT_NET_IP:$EXT_NET_PORT
 PersistentKeepalive = 25
@@ -420,7 +415,7 @@ $(allowedips_to_uci_list "$INT_NET_CLINET_ALLOWEDIPS")
 	option endpoint_port '$EXT_NET_PORT'
 	option persistent_keepalive '25'
 	option public_key '$(wg pubkey < wghub.key)'
-	option preshared_key '$(cat wgpsk.key)'
+	option preshared_key '$(cat "wgclient_$CONF_NAME.psk")'
 EOF
 }
 
@@ -439,7 +434,7 @@ add_client_to_hub_conf() {
 # $SEQNO: $CONF_NAME > wgclient_$CONF_NAME.conf
 [Peer]
 PublicKey = $(wg pubkey < "wgclient_$CONF_NAME.key")
-PresharedKey = $(cat wgpsk.key)
+PresharedKey = $(cat "wgclient_$CONF_NAME.psk")
 AllowedIPs = $INT_NET_ADDRESS$SEQNO$INT_NET_ADDRESS_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$1$INT_NET6_ADDRESS_MASK")
 EOF
     if $NET6 && test "$NET6MODE" = "proxy_ndp"; then
@@ -561,7 +556,6 @@ main() {
     SEQNO="$(get_seq_no)"
     test -f portno.txt || create_port_no
     EXT_NET_PORT="$(get_port_no)"
-    test -f wgpsk.key  || create_psk
     test -f wghub.key  || create_hub_key
     test -f wghub.conf || create_hub_conf
 
