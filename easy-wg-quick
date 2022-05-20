@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # $0 - Creates Wireguard configuration for hub and peers with ease
 # Copyright (C) 2019, 2020 Krzysztof Burghardt <krzysztof@burghardt.pl>
 #
@@ -370,6 +370,23 @@ EOF
 create_new_client_conf_wg_quick() {
     SEQNO="$1"
     CONF_NAME="$2"
+    INT_NET_MTU="$(get_int_net_mtu)"
+    INT_NET_MASK="$(get_int_net_mask)"
+    INT_NET_DNS="$(get_int_net_dns)"
+    INT_NET_ADDRESS="$(get_int_net_address)"
+    INT_NET_ADDRESS_MASK="/32"
+    INT_NET_HUB_IP="${INT_NET_ADDRESS}1"
+    INT_NET_CLINET_ALLOWEDIPS="$(get_client_allowedips)"
+    NET6=false
+    check_if_ipv6_is_available "$EXT_NET_IF" && {
+        NET6=true
+        NET6MODE="$(get_ipv6_mode)"
+        INT_NET6_MASK="$(get_int_net6_mask)"
+        INT_NET6_DNS="$(get_int_net6_dns)"
+        INT_NET6_ADDRESS="$(get_int_net6_address)"
+        INT_NET6_ADDRESS_MASK="/128"
+        INT_NET6_HUB_IP="${INT_NET6_ADDRESS}1"
+    }
 
     echo "No wgclient_$CONF_NAME.conf... creating one!"
     cat > "wgclient_$CONF_NAME.conf" << EOF
@@ -465,8 +482,8 @@ print_client_conf() {
 }
 
 print_client_qrcode() {
-    qrencode -t ansiutf8 < "wgclient_$2.conf" | tee "wgclient_$2.qrcode.txt"
-    echo "Scan QR code with your phone or use \"wgclient_$2.conf\" file."
+    qrencode -t ansiutf8 < "wgclient_$1.conf" | tee "wgclient_$1.qrcode.txt"
+    echo "Scan QR code with your phone or use \"wgclient_$1.conf\" file."
 }
 
 remove_temporary_client_key_file() {
@@ -611,6 +628,7 @@ main() {
         "init") easy_wg_quick_init ;;
         "auto") handholding "$@" ;;
         "viewclient") easy_wg_printclient "$@" ;;
+	"genclient") easy_wg_genclient "$@" ;;
         "help") easy_wg_usage ;;
         "-h") easy_wg_usage ;;
         "--help") easy_wg_usage ;;
