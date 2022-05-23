@@ -34,3 +34,44 @@ load teardown setup
     [ "$status" -eq 0 ]
     [ "${#lines[@]}" -gt 10 ]
 }
+
+@test "multiple mixed runs" {
+    run ../easy-wg-quick
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 3 ]
+    run cat wgclient_10.conf
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 10 ]
+
+
+    run ../easy-wg-quick
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 3 ]
+    run cat wgclient_11.conf
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 10 ]
+
+
+    run ../easy-wg-quick client01
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 3 ]
+    run cat wgclient_client01.conf
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 10 ]
+
+
+    run ../easy-wg-quick client02
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 3 ]
+    run cat wgclient_client02.conf
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 10 ]
+
+
+    run ../easy-wg-quick
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 3 ]
+    run cat wgclient_14.conf
+    [ "$status" -eq 0 ]
+    [ "${#lines[@]}" -gt 10 ]
+}
