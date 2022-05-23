@@ -7,7 +7,7 @@ load teardown setup
         skip "as Linux specific"
     fi
 
-    if [ "${GITHUB_ACTIONS}" == "true" ]; then
+    if [ "${GITHUB_ACTIONS}" = "true" ]; then
         skip "as not supported on GitHub Actions"
     fi
 
