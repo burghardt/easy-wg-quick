@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    name: sca check
+    name: sca
     runs-on: ubuntu-latest
     steps:
       - name: checkout
@@ -25,5 +25,3 @@ jobs:
         uses: actions/checkout@master
       - name: unit tests
         uses: ./.github/actions/bats
-      - name: test run
-        uses: ./.github/actions/testrun
