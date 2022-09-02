@@ -4,7 +4,6 @@ test_task:
   freebsd_instance:
     matrix:
       image_family: freebsd-13-1
-      image_family: freebsd-13-0
       image_family: freebsd-12-3
   env:
     CIRRUS_CLONE_DEPTH: 10
