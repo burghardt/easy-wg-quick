@@ -9,7 +9,7 @@ load teardown setup
     [ "${#lines[@]}" -gt 10 ]
     run grep 'iptables -A FORWARD' wghub.conf
     [ "$status" -eq 0 ]
-    [ "$output" == "PostUp = iptables -A FORWARD -i %i -j ACCEPT" ]
+    [ "${lines[0]}" == "PostUp = iptables -I DOCKER-USER -i %i -j ACCEPT || iptables -A FORWARD -i %i -j ACCEPT" ]
 }
 
 @test "run with firewall type set to firewalld" {
