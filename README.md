@@ -31,6 +31,11 @@ These instructions will get you a copy of the project up and running on your
 local machine. This machine (called hub) will act as VPN concentrator. All
 other peers connects to hub (as in a "road warrior" configuration).
 
+### Terraform
+
+Terraform code for deploying `easy-wg-quick` in the Google Cloud Platform
+is available from the [tf-gcp-easy-wg-quick] repository.
+
 ### Prerequisites
 
 Install [Wireguard] for your operating system on [local machine], [router],
@@ -412,6 +417,7 @@ details.
 
 OpenVPN's [easy-rsa] was an inspiration for writing this script.
 
+[tf-gcp-easy-wg-quick]: https://github.com/burghardt/tf-gcp-easy-wg-quick
 [Wireguard]: https://www.wireguard.com/
 [local machine]: https://www.wireguard.com/install/
 [router]: https://openwrt.org/docs/guide-user/services/vpn/wireguard
