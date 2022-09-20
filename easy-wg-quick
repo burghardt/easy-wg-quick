@@ -366,6 +366,35 @@ EOF
     echo "Note: customize [Interface] section of wghub.conf if required!"
 }
 
+
+ip2int() {
+    { IFS=. read -r a b c d; } <<EOF
+$1
+EOF
+    echo $(((((((a << 8) | b) << 8) | c) << 8) | d))
+}
+
+int2ip() {
+    ui32=$1
+    ip=""
+    # shellcheck disable=SC2034
+    for n in 1 2 3 4; do
+        ip=$((ui32 & 0xff))${ip:+.}$ip
+        ui32=$((ui32 >> 8))
+    done
+    echo "$ip"
+}
+
+create_new_client_ip() {
+    { IFS=/ read -r ip netmask; } <<EOF
+$1
+EOF
+    seqno=$2
+    bitmask=$((0xffffffff << (32 - netmask)))
+    addr=$(($(ip2int "$ip") + (seqno & ~bitmask)))
+    echo "$(int2ip $addr)/$netmask"
+}
+
 create_new_client_conf_wg_quick() {
     SEQNO="$1"
     CONF_NAME="$2"
@@ -374,7 +403,7 @@ create_new_client_conf_wg_quick() {
     cat > "wgclient_$CONF_NAME.conf" << EOF
 # $SEQNO: $CONF_NAME > wgclient_$CONF_NAME.conf
 [Interface]
-Address = $INT_NET_ADDRESS$SEQNO$INT_NET_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$SEQNO$INT_NET6_MASK")
+Address = $(create_new_client_ip "${INT_NET_ADDRESS}0$INT_NET_MASK" "$SEQNO")$($NET6 && echo ", $INT_NET6_ADDRESS$SEQNO$INT_NET6_MASK")
 DNS = $INT_NET_DNS$($NET6 && echo ", $INT_NET6_DNS")
 PrivateKey = $(wg genkey | tee "wgclient_$CONF_NAME.key")
 MTU = $INT_NET_MTU
@@ -405,7 +434,7 @@ create_new_client_conf_uci() {
 # $SEQNO: $CONF_NAME > wgclient_$CONF_NAME.uci.txt
 config interface 'wg0'
 	option proto 'wireguard'
-	list addresses '$INT_NET_ADDRESS$SEQNO$INT_NET_MASK'
+	list addresses '$(create_new_client_ip "${INT_NET_ADDRESS}0$INT_NET_MASK" "$SEQNO")'
 $($NET6 && echo "	list addresses '$INT_NET6_ADDRESS$SEQNO$INT_NET6_MASK'")
 	list dns '$INT_NET_DNS'
 $($NET6 && echo "	list dns '$INT_NET6_DNS'")
