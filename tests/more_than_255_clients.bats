@@ -7,6 +7,7 @@ load teardown setup
     echo /16 > intnetmask.txt
     echo 10.99.0. > intnetaddress.txt
     echo fd72:5676:4409:7609:: > intnet6address.txt
+    touch forceipv6.txt
     run ../easy-wg-quick
     [ "$status" -eq 0 ]
     [ "${#lines[@]}" -gt 3 ]
@@ -21,6 +22,7 @@ load teardown setup
     echo /16 > intnetmask.txt
     echo 10.99.0. > intnetaddress.txt
     echo fd72:5676:4409:7609:: > intnet6address.txt
+    touch forceipv6.txt
     run ../easy-wg-quick
     [ "$status" -eq 0 ]
     [ "${#lines[@]}" -gt 3 ]
@@ -35,6 +37,7 @@ load teardown setup
     echo /16 > intnetmask.txt
     echo 10.99.0. > intnetaddress.txt
     echo fd72:5676:4409:7609:: > intnet6address.txt
+    touch forceipv6.txt
     run ../easy-wg-quick
     [ "$status" -eq 0 ]
     [ "${#lines[@]}" -gt 3 ]
