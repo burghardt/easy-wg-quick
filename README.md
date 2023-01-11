@@ -221,7 +221,12 @@ prefered IP address in `extnetip.txt` file with command:
 In case of NAT/PAT/masquarading one can try to use service like [ifconfig.co]
 for autodetection:
 
-    curl ifconfig.co/ip > extnetip.txt
+    curl -4 ifconfig.co/ip > extnetip.txt
+
+For IPv6 addresses, one can use curl's `-6` switch. Brackets around IPv6
+addresses are required:
+
+    sed -i 's/\(.*\)/[\1]/' extnetip.txt
 
 ### Disabling random port assignment
 
