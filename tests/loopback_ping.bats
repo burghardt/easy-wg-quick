@@ -3,11 +3,12 @@
 load teardown setup
 
 @test "run to check ping over the loopback" {
-    if [ "$(uname -s)" != "Linux" ]; then
+    if [[ "$(uname -s)" != "Linux" ]]; then
         skip "as Linux specific"
     fi
 
-    if [ "${GITHUB_ACTIONS}" = "true" ]; then
+    # shellcheck disable=SC2154
+    if [[ "${GITHUB_ACTIONS}" = "true" ]]; then
         skip "as not supported on GitHub Actions"
     fi
 

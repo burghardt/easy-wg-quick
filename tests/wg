@@ -2,14 +2,14 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-if [ "$1" == "genpsk" ]; then
+if [[ "$1" == "genpsk" ]]; then
     echo 'qRF8FZ3bPrvfEy0F1+K4/J8ySS4yKFjV6WdSvKBs4Oo='
-elif [ "$1" == "genkey" ]; then
+elif [[ "$1" == "genkey" ]]; then
     echo 'aFj9NLLBci/8xWCErHBHQ+Lz3eNrJZ5VlfW1dDEpxH8='
-elif [ "$1" == "pubkey" ]; then
+elif [[ "$1" == "pubkey" ]]; then
     echo 'a+4ANyG+HEgiUqYeQI4dsOvlg4FCK64IcLZgMmkjnyE='
-elif [ "$1" == "show" ]; then
-    if [ "$2" == "interfaces" ]; then
+elif [[ "$1" == "show" ]]; then
+    if [[ "$2" == "interfaces" ]]; then
         echo "eth0"
     else
         exit 1
