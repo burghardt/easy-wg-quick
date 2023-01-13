@@ -3,7 +3,7 @@
 load teardown setup
 
 @test "run to check key usage in UCI" {
-    skip
+    touch forceipv6.txt
     echo none > fwtype.txt
     echo none > sysctltype.txt
     run ../easy-wg-quick test_keys
