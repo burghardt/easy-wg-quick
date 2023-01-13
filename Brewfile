@@ -1,5 +1,8 @@
 brew "wireguard-tools"
+
+# optional
 brew "qrencode"
 
-# required to run test-suite
+# required only to run tests
 brew "bats-core"
+brew "iproute2mac"
