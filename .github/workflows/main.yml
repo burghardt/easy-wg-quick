@@ -52,3 +52,28 @@ jobs:
         run: sudo wg show
       - name: wg-quick down
         run: sudo wg-quick down ./wghub.conf
+  ubuntu:
+    name: ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+      - name: install wireguard
+        run: sudo apt install -y wireguard-tools
+      - name: create wghub.conf
+        run: |
+          echo none > fwtype.txt
+          ./easy-wg-quick
+          ./easy-wg-quick macos_named_client
+      - name: dump configuration
+        run: head *.txt *.key *.conf
+      - name: dump wghub.conf
+        run: cat wghub.conf
+      - name: empty file check
+        run: ls *.txt *.key *.conf | xargs -tn1 test -s
+      - name: wg-quick up
+        run: sudo wg-quick up ./wghub.conf
+      - name: check interface
+        run: sudo wg show
+      - name: wg-quick down
+        run: sudo wg-quick down ./wghub.conf
