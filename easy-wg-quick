@@ -370,7 +370,7 @@ EOF
 
 
 ip2int() {
-    { IFS=. read -r a b c d; } <<EOF
+    { IFS=. read -r a b c d; } << EOF
 $1
 EOF
     echo $(((((((a << 8) | b) << 8) | c) << 8) | d))
@@ -388,7 +388,7 @@ int2ip() {
 }
 
 create_new_client_ip() {
-    { IFS=/ read -r ip netmask; } <<EOF
+    { IFS=/ read -r ip netmask; } << EOF
 $1
 EOF
     seqno=$2
