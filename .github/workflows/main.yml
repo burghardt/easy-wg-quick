@@ -25,3 +25,30 @@ jobs:
         uses: actions/checkout@master
       - name: unit tests
         uses: ./.github/actions/bats
+  macos:
+    name: macos
+    runs-on: macos-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+      - name: brew bundle
+        run: brew bundle
+      - name: unit tests
+        run: ( cd tests ; ./runtests.bash )
+      - name: create wghub.conf
+        run: |
+          echo none > fwtype.txt
+          ./easy-wg-quick
+          ./easy-wg-quick macos_named_client
+      - name: dump configuration
+        run: head *.txt *.key *.conf
+      - name: dump wghub.conf
+        run: cat wghub.conf
+      - name: empty file check
+        run: ls *.txt *.key *.conf | xargs -tn1 test -s
+      - name: wg-quick up
+        run: sudo wg-quick up ./wghub.conf
+      - name: check interface
+        run: sudo wg show
+      - name: wg-quick down
+        run: sudo wg-quick down ./wghub.conf

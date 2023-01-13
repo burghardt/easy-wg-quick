@@ -32,7 +32,7 @@ check_if_wg_is_installed() {
 }
 
 detect_ext_net_if() {
-    if test "$(uname -s)" = "FreeBSD"; then
+    if test "$(uname -s)" = "FreeBSD" || test "$(uname -s)" = "Darwin"; then
         route get default | awk '$1 == "interface:" { print $2 }'
     elif test "$(uname -s)" = "Linux"; then
         ip route sh | awk '$1 == "default" && $2 == "via" { print $5; exit }'
@@ -56,6 +56,8 @@ get_ext_net_if() {
 detect_ext_net_ip() {
     if test "$(uname -s)" = "FreeBSD"; then
         ifconfig "$1" | awk '$1 == "inet" { print $2 }'
+    elif test "$(uname -s)" = "Darwin"; then
+        ip addr sh "$1" | grep 'inet ' | xargs | awk -F'[ /]' '{ print $2 }'
     elif test "$(uname -s)" = "Linux"; then
         ip addr sh "$1" | grep 'inet ' | xargs | awk -F'[ /]' '{ print $2 }'
     fi
@@ -85,7 +87,7 @@ get_client_allowedips() {
 }
 
 detect_fw_type() {
-    if test "$(uname -s)" = "FreeBSD"; then
+    if test "$(uname -s)" = "FreeBSD" || test "$(uname -s)" = "Darwin"; then
         echo "pf"
     elif test "$(uname -s)" = "Linux"; then
         echo "iptables"
@@ -107,7 +109,7 @@ get_fw_type() {
 }
 
 detect_sysctl_type() {
-    if test "$(uname -s)" = "FreeBSD"; then
+    if test "$(uname -s)" = "FreeBSD" || test "$(uname -s)" = "Darwin"; then
         echo "freebsd"
     elif test "$(uname -s)" = "Linux"; then
         echo "linux"
