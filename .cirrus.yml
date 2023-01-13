@@ -29,3 +29,5 @@ test_task:
   check_interface_script:
     - ifconfig wghub
     - wg show
+  teardown_wireguard_interface_script:
+    - wg-quick down ./wghub.conf
