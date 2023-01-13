@@ -1,6 +1,6 @@
 #!/bin/sh
-# easy-wg-quick - Creates Wireguard configuration for hub and peers with ease
-# Copyright (C) 2019, 2020 Krzysztof Burghardt <krzysztof@burghardt.pl>
+# easy-wg-quick - Creates WireGuard configuration for hub and peers with ease
+# Copyright (C) 2019-2023 Krzysztof Burghardt <krzysztof@burghardt.pl>
 #
 #
 # License
@@ -25,7 +25,7 @@
 
 check_if_wg_is_installed() {
     wg show interfaces >/dev/null 2>&1 || {
-        echo 'Unable to use "wg" command. Are wireguard tools installed?'
+        echo 'Unable to use "wg" command. Are WireGuard tools installed?'
         printf 'Read https://github.com/burghardt/easy-wg-quick#prerequisites\n'
         exit 1
     }
@@ -171,7 +171,7 @@ create_port_no() {
     echo "No portno.txt... creating one!"
     (shuf -i 1025-65535 -n 1 || jot -r 1 1025 65535) > portno.txt 2>/dev/null
     test -s portno.txt || {
-        echo 'Unable to assign random port for Wireguard.'
+        echo 'Unable to assign random port for WireGuard.'
         echo 'Set it manually in portno.txt file and start script again.'
         exit 1
     }
@@ -364,7 +364,7 @@ EOF
         echo '# Sysctl PostUp / PostDown commands disabled with "none" set in sysctltype.txt' >> wghub.conf
     fi
 
-    echo "Wireguard hub address is $EXT_NET_IP:$EXT_NET_PORT on $EXT_NET_IF."
+    echo "WireGuard hub address is $EXT_NET_IP:$EXT_NET_PORT on $EXT_NET_IF."
     echo "Note: customize [Interface] section of wghub.conf if required!"
 }
 
@@ -481,7 +481,7 @@ EOF
     echo " done!"
 cat << EOF
 
-Important: Deploy updated wghub.conf configuration to wireguard with wg-quick:
+Important: Deploy updated wghub.conf configuration to WireGuard with wg-quick:
   sudo wg-quick down ./wghub.conf # if already configured
   sudo wg-quick up ./wghub.conf
   sudo wg show # to check status

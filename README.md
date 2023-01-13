@@ -1,5 +1,5 @@
 # easy-wg-quick
-easy-wg-quick - Creates Wireguard configuration for hub and peers with ease
+easy-wg-quick - Creates WireGuard configuration for hub and peers with ease
 
  * [Getting Started](#getting-started)
    * [Terraform](#terraform)
@@ -39,7 +39,7 @@ is available from the [tf-gcp-easy-wg-quick] repository.
 
 ### Prerequisites
 
-Install [Wireguard] for your operating system on [local machine], [router],
+Install [WireGuard] for your operating system on [local machine], [router],
 [VPS] or [container]. This will be your hub.
 
 As dependences `/bin/sh`, `wg`, `wg-quick`, `awk`, `grep` and `ip` commands
@@ -60,13 +60,17 @@ to generate [QR codes] for mobile applications.
 
     sudo pkg install net/wireguard graphics/libqrencode
 
-#### Installing Wireguard tools (and modules)
+#### macOS
 
-This script requires only tools installed, but to use Wireguard module
+    brew install wireguard-tools qrencode
+
+#### Installing WireGuard tools (and modules)
+
+This script requires only tools installed, but to use WireGuard module
 (or user-space implementation) is also required. Detailed install guide
 for various operating systems is available at [wireguard.com/install].
 
-Peers also requires Wireguard installed. [Android] and [iOS] are supported.
+Peers also requires WireGuard installed. [Android] and [iOS] are supported.
 [OpenWRT clients] are supported with [UCI] configuration fragments.
 
 ### Installing
@@ -88,7 +92,7 @@ Or clone repository.
 ## Usage
 
 Script do not require any arguments. Just run it and it will create usable
-Wireguard configuration for hub and one peer. Any sequential invocation creates
+WireGuard configuration for hub and one peer. Any sequential invocation creates
 another peer configuration within same hub.
 
     ./easy-wg-quick # 1st run creates hub configuration and one client
@@ -106,7 +110,7 @@ Following command will create `wgclient_client_name.conf` file.
 No seqno.txt... creating one!
 No wghub.key... creating one!
 No wghub.conf... creating one!
-Wireguard hub address is 10.13.1.140:51820 on wlp9s0.
+WireGuard hub address is 10.13.1.140:51820 on wlp9s0.
 Note: customize [Interface] section of wghub.conf if required!
 
 Note: passing argument to script creates client configuration with supplied
@@ -156,7 +160,7 @@ No wgclient_10.conf... creating one!
 Scan QR code with your phone or use "wgclient_10.conf" file.
 Updating wghub.conf... done!
 
-Important: Deploy updated wghub.conf configuration to wireguard with wg-quick:
+Important: Deploy updated wghub.conf configuration to WireGuard with wg-quick:
   sudo wg-quick down ./wghub.conf # if already configured
   sudo wg-quick up ./wghub.conf
   sudo wg show # to check status
@@ -164,7 +168,7 @@ Important: Deploy updated wghub.conf configuration to wireguard with wg-quick:
 
 ### Using generated configuration
 
-On hub configure Wireguard.
+On hub configure WireGuard.
 
     sudo wg-quick up ./wghub.conf
 
@@ -176,7 +180,7 @@ Or use saved QR code
 
     cat wgclient_10.qrcode.txt
 
-To connect the whole network with a single Wireguard client running on an
+To connect the whole network with a single WireGuard client running on an
 [OpenWRT] router, append generated [UCI] client configuration fragment to
 your router `/etc/config/network` file.
 
@@ -261,7 +265,7 @@ and `intnet6mask.txt` (IPv6).
 ### Setting interface's maximum transmission unit (MTU) size
 
 To change the default interface's maximum transmission unit (MTU) size of 1280
-bytes, write a new value into the file named `intnetmtu.txt`. Wireguard MTU
+bytes, write a new value into the file named `intnetmtu.txt`. WireGuard MTU
 should be between 1280 and 1420 bytes.
 
     echo 1380 > intnetmtu.txt
@@ -294,7 +298,9 @@ ranges in the `intnetallowedips.txt` file:
 ### Choosing firewall type
 
 Firewall type is guessed from operating system. For Linux `iptables` and
-`ip6tables` are used. For FreeBSD basic `pf` NAT rules are implemented.
+`ip6tables` are used. For FreeBSD and macOS basic `pf` NAT rules are
+implemented.
+
 File `fwtype.txt` contains name of firewall type. To override autodetection
 or disable any rules run one of the following commands:
 
@@ -319,9 +325,11 @@ Format of `commands.txt` is:
 
 ### Choosing if PostUp/PostDown should enable/disable IP forwarding
 
-Sysctl command syntax is guessed from operating system. Linux and FreeBSD
-are supported. As enabling IP forwarding is required for hub to forward VPN
-traffic to the Internet it is managed by PostUp/PostDown settings by default.
+Sysctl command syntax is guessed from operating system. Linux, FreeBSD (and
+macOS) are supported. As enabling IP forwarding is required for hub to forward
+VPN traffic to the Internet it is managed by PostUp/PostDown settings by
+default.
+
 Some application (i.e. [Docker]) might require that IP forwarding is never
 disabled. In that case setting `none` in `sysctltype.txt` and managing IP
 forwarding settings [elsewhere] might be required.
@@ -357,7 +365,7 @@ address to work. On the other hand network address translation (NAT) has
 
 [Neighbor Discovery] [Proxies (ND Proxy, NDP Proxy)] allows [end-to-end
 connectivity], but requires /64 network to be assigned to hub. From this /64
-network, a subnetwork has to be divided (i.e. /112) and assigned to Wireguard
+network, a subnetwork has to be divided (i.e. /112) and assigned to WireGuard
 interface.
 
 To enable proxied NDP create file named `ipv6mode.txt` with `proxy_ndp` string.
@@ -365,7 +373,7 @@ To enable proxied NDP create file named `ipv6mode.txt` with `proxy_ndp` string.
     echo proxy_ndp > ipv6mode.txt
 
 When hub has 2001:19f0:6c01:1c0d/64 assigned, part of it can be assigned to
-Wireguard interface (i.e. 2001:19f0:6c01:1c0d:40/112).
+WireGuard interface (i.e. 2001:19f0:6c01:1c0d:40/112).
 
     echo 2001:19f0:6c01:1c0d:40:: > intnet6address.txt
     echo /112 > intnet6mask.txt
@@ -406,7 +414,7 @@ On Linux clients setting the same should improve the fairness of upload flows.
 ### Persisting configuration with systemd
 
 [Systemd] may load configuration for both hub and clients using
-`wg-quick.service`. Note that also [native support] for setting up Wireguard
+`wg-quick.service`. Note that also [native support] for setting up WireGuard
 interfaces exists (since version 237).
 
     sudo cp wghub.conf /etc/wireguard/wghub.conf
@@ -424,7 +432,7 @@ details.
 OpenVPN's [easy-rsa] was an inspiration for writing this script.
 
 [tf-gcp-easy-wg-quick]: https://github.com/burghardt/tf-gcp-easy-wg-quick
-[Wireguard]: https://www.wireguard.com/
+[WireGuard]: https://www.wireguard.com/
 [local machine]: https://www.wireguard.com/install/
 [router]: https://openwrt.org/docs/guide-user/services/vpn/wireguard
 [VPS]: https://en.wikipedia.org/wiki/Virtual_private_server
