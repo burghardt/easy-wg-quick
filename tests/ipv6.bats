@@ -10,14 +10,14 @@ load teardown setup
     echo iptables > fwtype.txt
     echo linux > sysctltype.txt
     run ../easy-wg-quick
-    [ "$status" -eq 0 ]
-    [ "${#lines[@]}" -gt 10 ]
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -gt 10 ]]
     run grep 'ip6tables -t nat -A POSTROUTING' wghub.conf
-    [ "$status" -eq 0 ]
+    [[ "$status" -eq 0 ]]
     run grep 'sysctl -q -w net.ipv6.conf.all.proxy_ndp=1' wghub.conf
-    [ "$status" -eq 1 ]
+    [[ "$status" -eq 1 ]]
     run grep 'ip -6 neigh add proxy' wghub.conf
-    [ "$status" -eq 1 ]
+    [[ "$status" -eq 1 ]]
 }
 
 @test "run to create networks with ndp proxy for hub configuration" {
@@ -28,12 +28,12 @@ load teardown setup
     echo iptables > fwtype.txt
     echo linux > sysctltype.txt
     run ../easy-wg-quick
-    [ "$status" -eq 0 ]
-    [ "${#lines[@]}" -gt 10 ]
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -gt 10 ]]
     run grep 'sysctl -q -w net.ipv6.conf.all.proxy_ndp=1' wghub.conf
-    [ "$status" -eq 0 ]
+    [[ "$status" -eq 0 ]]
     run grep 'ip -6 neigh add proxy' wghub.conf
-    [ "$status" -eq 0 ]
+    [[ "$status" -eq 0 ]]
     run grep 'ip6tables -t nat -A POSTROUTING' wghub.conf
-    [ "$status" -eq 1 ]
+    [[ "$status" -eq 1 ]]
 }
