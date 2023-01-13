@@ -163,7 +163,7 @@ create_seq_no() {
 get_seq_no() {
     SEQNO=$(cat seqno.txt)
     NEXT=$((SEQNO+1))
-    update_seq_no $NEXT
+    update_seq_no "$NEXT"
     echo "$SEQNO"
 }
 
@@ -394,7 +394,7 @@ EOF
     seqno=$2
     bitmask=$((0xffffffff << (32 - netmask)))
     addr=$(($(ip2int "$ip") + (seqno & ~bitmask)))
-    echo "$(int2ip $addr)/$netmask"
+    echo "$(int2ip "$addr")/$netmask"
 }
 
 create_new_client_conf_wg_quick() {
