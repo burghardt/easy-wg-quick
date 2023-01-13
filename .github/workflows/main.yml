@@ -25,3 +25,13 @@ jobs:
         uses: actions/checkout@master
       - name: unit tests
         uses: ./.github/actions/bats
+  macos:
+    name: macos
+    runs-on: macos-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@master
+      - name: brew bundle
+        run: brew bundle
+      - name: unit tests
+        run: ( cd tests ; ./runtests.bash )
