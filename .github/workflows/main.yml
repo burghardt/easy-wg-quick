@@ -35,3 +35,20 @@ jobs:
         run: brew bundle
       - name: unit tests
         run: ( cd tests ; ./runtests.bash )
+      - name: create wghub.conf
+        run: |
+          echo none > fwtype.txt
+          ./easy-wg-quick
+          ./easy-wg-quick macos_named_client
+      - name: dump configuration
+        run: head *.txt *.key *.conf
+      - name: dump wghub.conf
+        run: cat wghub.conf
+      - name: empty file check
+        run: ls *.txt *.key *.conf | xargs -tn1 test -s
+      - name: wg-quick up
+        run: wg-quick up ./wghub.conf
+      - name: check interface
+        run: wg show
+      - name: wg-quick down
+        run: wg-quick down ./wghub.conf
