@@ -30,6 +30,7 @@ load teardown setup
 @test "run with firewall type set to ufw" {
     echo ufw > fwtype.txt
     echo eth5 > extnetif.txt
+    echo 10.20.30.40 > extnetip.txt
     echo 123 > portno.txt
     run ../easy-wg-quick
     [[ "$status" -eq 0 ]]
