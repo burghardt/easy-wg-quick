@@ -298,6 +298,23 @@ PostDown = firewall-cmd --zone=public --remove-masquerade
 EOF
 }
 
+create_ufw_rules() {
+    cat << EOF
+PostUp = ufw allow $EXT_NET_PORT/udp
+PostUp = ufw route allow in on %i out on $EXT_NET_IF
+PostUp = ufw route allow in on %i out on %i
+PostUp = iptables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostUp = iptables -t mangle -A POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+PostUp = ip6tables -t mangle -A POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+PostDown = ufw delete allow $EXT_NET_PORT/udp
+PostDown = ufw route delete allow in on %i out on $EXT_NET_IF
+PostDown = ufw route delete allow in on %i out on %i
+PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostDown = iptables -t mangle -D POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+PostDown = ip6tables -t mangle -D POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+EOF
+}
+
 create_sysctl_linux_rules() {
     cat << EOF
 PostUp = sysctl -q -w net.ipv4.ip_forward=1
@@ -347,6 +364,8 @@ EOF
         create_iptables_rules >> wghub.conf
     elif test "$FW_TYPE" = "firewalld"; then
         create_firewalld_rules >> wghub.conf
+    elif test "$FW_TYPE" = "ufw"; then
+        create_ufw_rules >> wghub.conf
     elif test "$FW_TYPE" = "pf"; then
         create_pf_rules >> wghub.conf
     elif test "$FW_TYPE" = "custom"; then

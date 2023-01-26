@@ -27,6 +27,25 @@ load teardown setup
     [[ "${lines[3]}" == "PostDown = firewall-cmd --zone=public --remove-masquerade" ]]
 }
 
+@test "run with firewall type set to ufw" {
+    echo ufw > fwtype.txt
+    echo eth5 > extnetif.txt
+    echo 10.20.30.40 > extnetip.txt
+    echo 123 > portno.txt
+    run ../easy-wg-quick
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -gt 10 ]]
+    run grep 'ufw ' wghub.conf
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -eq 6 ]]
+    [[ "${lines[0]}" == "PostUp = ufw allow 123/udp" ]]
+    [[ "${lines[1]}" == "PostUp = ufw route allow in on %i out on eth5" ]]
+    [[ "${lines[2]}" == "PostUp = ufw route allow in on %i out on %i" ]]
+    [[ "${lines[3]}" == "PostDown = ufw delete allow 123/udp" ]]
+    [[ "${lines[4]}" == "PostDown = ufw route delete allow in on %i out on eth5" ]]
+    [[ "${lines[5]}" == "PostDown = ufw route delete allow in on %i out on %i" ]]
+}
+
 @test "run with firewall type set to OpenBSD PF" {
     echo pf > fwtype.txt
     run ../easy-wg-quick
