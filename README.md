@@ -306,6 +306,7 @@ or disable any rules run one of the following commands:
 
     echo iptables  > fwtype.txt  # to choose Linux netfilter
     echo firewalld > fwtype.txt  # to choose [firewalld]
+    echo ufw       > fwtype.txt  # to choose Uncomplicated Firewall
     echo pf        > fwtype.txt  # to choose OpenBSD PF
     echo custom    > fwtype.txt  # to include predefined commands from file
     echo none      > fwtype.txt  # to skip any setup during wg-quick up/down
