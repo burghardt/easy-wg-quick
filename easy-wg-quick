@@ -313,6 +313,12 @@ PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = iptables -t mangle -D POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 PostDown = ip6tables -t mangle -D POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
 EOF
+    if test "$NET6MODE" = "masquerade"; then
+        cat << EOF
+PostUp = ip6tables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+PostDown = ip6tables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
+EOF
+    fi
 }
 
 create_sysctl_linux_rules() {
