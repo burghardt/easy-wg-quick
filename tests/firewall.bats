@@ -20,11 +20,13 @@ load teardown setup
     [[ "${#lines[@]}" -gt 10 ]]
     run grep 'firewall-cmd --zone=public' wghub.conf
     [[ "$status" -eq 0 ]]
-    [[ "${#lines[@]}" -eq 4 ]]
+    [[ "${#lines[@]}" -eq 6 ]]
     [[ "${lines[0]}" == "PostUp = firewall-cmd --zone=public --add-port 31337/udp" ]]
     [[ "${lines[1]}" == "PostUp = firewall-cmd --zone=public --add-masquerade" ]]
-    [[ "${lines[2]}" == "PostDown = firewall-cmd --zone=public --remove-port 31337/udp" ]]
-    [[ "${lines[3]}" == "PostDown = firewall-cmd --zone=public --remove-masquerade" ]]
+    [[ "${lines[2]}" == "PostUp = firewall-cmd --zone=public --add-rich-rule='rule tcp-mss-clamp value=pmtu'" ]]
+    [[ "${lines[3]}" == "PostDown = firewall-cmd --zone=public --remove-port 31337/udp" ]]
+    [[ "${lines[4]}" == "PostDown = firewall-cmd --zone=public --remove-masquerade" ]]
+    [[ "${lines[5]}" == "PostDown = firewall-cmd --zone=public --remove-rich-rule='rule tcp-mss-clamp value=pmtu'" ]]
 }
 
 @test "run with firewall type set to ufw" {
