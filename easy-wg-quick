@@ -293,8 +293,10 @@ create_firewalld_rules() {
     cat << EOF
 PostUp = firewall-cmd --zone=public --add-port $EXT_NET_PORT/udp
 PostUp = firewall-cmd --zone=public --add-masquerade
+PostUp = firewall-cmd --zone=public --add-rich-rule='rule tcp-mss-clamp value=pmtu'
 PostDown = firewall-cmd --zone=public --remove-port $EXT_NET_PORT/udp
 PostDown = firewall-cmd --zone=public --remove-masquerade
+PostDown = firewall-cmd --zone=public --remove-rich-rule='rule tcp-mss-clamp value=pmtu'
 EOF
 }
 
