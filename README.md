@@ -301,6 +301,17 @@ Firewall type is guessed from operating system. For Linux `iptables` and
 `ip6tables` are used. For FreeBSD and macOS basic `pf` NAT rules are
 implemented.
 
+There are other firewall implementations to choose from. The following table
+compares the features of the alternative implementations.
+
+| Firewall type | IPv4 MASQ | IPv6 MASQ | IPv6 NDP | TCP MSS clamp |
+| --------------|-----------|-----------|----------|---------------|
+| iptables      | &check;   | &check;   | &check;  | &check;       |
+| ufw           | &check;   | &check;   | &check;  | &check;       |
+| firewalld     | &check;   | &check;   | _        | &check;       |
+| pf            | &check;   | -         | _        | _             |
+| custom / none | -         | -         | -        | -             |
+
 File `fwtype.txt` contains name of firewall type. To override autodetection
 or disable any rules run one of the following commands:
 
