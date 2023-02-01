@@ -267,21 +267,21 @@ create_hub_key() {
 create_iptables_rules() {
     cat << EOF
 PostUp = iptables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
-PostUp = ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
+$($NET6 && echo "PostUp = ip6tables -t mangle -A POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu")
 PostUp = iptables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostUp = iptables -I DOCKER-USER -i %i -j ACCEPT || iptables -A FORWARD -i %i -j ACCEPT
-PostUp = ip6tables -I DOCKER-USER -i %i -j ACCEPT || ip6tables -A FORWARD -i %i -j ACCEPT
+$($NET6 && echo "PostUp = ip6tables -I DOCKER-USER -i %i -j ACCEPT || ip6tables -A FORWARD -i %i -j ACCEPT")
 PostUp = iptables -I DOCKER-USER -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || iptables -A FORWARD -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-PostUp = ip6tables -I DOCKER-USER -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || ip6tables -A FORWARD -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+$($NET6 && echo "PostUp = ip6tables -I DOCKER-USER -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || ip6tables -A FORWARD -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT")
 PostDown = iptables -D DOCKER-USER -i %i -j ACCEPT || iptables -D FORWARD -i %i -j ACCEPT
-PostDown = ip6tables -D DOCKER-USER -i %i -j ACCEPT || iptables -D FORWARD -i %i -j ACCEPT
+$($NET6 && echo "PostDown = ip6tables -D DOCKER-USER -i %i -j ACCEPT || iptables -D FORWARD -i %i -j ACCEPT")
 PostDown = iptables -D DOCKER-USER -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || iptables -D FORWARD -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-PostDown = ip6tables -D DOCKER-USER -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || ip6tables -D FORWARD -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+$($NET6 && echo "PostDown = ip6tables -D DOCKER-USER -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT || ip6tables -D FORWARD -o %i -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT")
 PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = iptables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
-PostDown = ip6tables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu
+$($NET6 && echo "PostDown = ip6tables -t mangle -D POSTROUTING -p tcp --tcp-flags SYN,RST SYN -o $EXT_NET_IF -j TCPMSS --clamp-mss-to-pmtu")
 EOF
-    if test "$NET6MODE" = "masquerade"; then
+    if $NET6 && test "$NET6MODE" = "masquerade"; then
         cat << EOF
 PostUp = ip6tables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = ip6tables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
@@ -307,15 +307,15 @@ PostUp = ufw route allow in on %i out on $EXT_NET_IF
 PostUp = ufw route allow in on %i out on %i
 PostUp = iptables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostUp = iptables -t mangle -A POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-PostUp = ip6tables -t mangle -A POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+$($NET6 && echo "PostUp = ip6tables -t mangle -A POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu")
 PostDown = ufw delete allow $EXT_NET_PORT/udp
 PostDown = ufw route delete allow in on %i out on $EXT_NET_IF
 PostDown = ufw route delete allow in on %i out on %i
 PostDown = iptables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = iptables -t mangle -D POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
-PostDown = ip6tables -t mangle -D POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu
+$($NET6 && echo "PostDown = ip6tables -t mangle -D POSTROUTING -o $EXT_NET_IF -p tcp -m tcp --tcp-flags SYN,RST SYN -j TCPMSS --clamp-mss-to-pmtu")
 EOF
-    if test "$NET6MODE" = "masquerade"; then
+    if $NET6 && test "$NET6MODE" = "masquerade"; then
         cat << EOF
 PostUp = ip6tables -t nat -A POSTROUTING -o $EXT_NET_IF -j MASQUERADE
 PostDown = ip6tables -t nat -D POSTROUTING -o $EXT_NET_IF -j MASQUERADE
@@ -330,7 +330,7 @@ PostUp = sysctl -q -w net.ipv6.conf.all.forwarding=1
 PostDown = sysctl -q -w net.ipv4.ip_forward=0
 PostDown = sysctl -q -w net.ipv6.conf.all.forwarding=0
 EOF
-    if test "$NET6MODE" = "proxy_ndp"; then
+    if $NET6 && test "$NET6MODE" = "proxy_ndp"; then
         cat << EOF
 PostUp = sysctl -q -w net.ipv6.conf.all.proxy_ndp=1
 PostDown = sysctl -q -w net.ipv6.conf.all.proxy_ndp=0
