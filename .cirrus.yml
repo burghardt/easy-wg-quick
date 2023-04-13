@@ -10,6 +10,8 @@ test_task:
   pkginstall_script:
     - pkg install -y net/wireguard net/wireguard-kmod graphics/libqrencode
     - pkg install -y shells/bash devel/bats-core
+  kldload_if_wg_script:
+    - kldload if_wg
   unittests_script:
     - cd tests && ./runtests.bash
   configure_script:
