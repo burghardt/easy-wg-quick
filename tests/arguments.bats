@@ -47,6 +47,30 @@ load teardown setup
     [[ "${#lines[@]}" -ge 1 ]]
 }
 
+@test "run with -i parameter" {
+    run ../easy-wg-quick -i
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -ge 1 ]]
+}
+
+@test "run with --init parameter" {
+    run ../easy-wg-quick --init
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -ge 1 ]]
+}
+
+@test "run with -c parameter" {
+    run ../easy-wg-quick -c
+    [[ "$status" -eq 1 ]]
+    [[ "${#lines[@]}" -ge 1 ]]
+}
+
+@test "run with --clear parameter" {
+    run ../easy-wg-quick --clear
+    [[ "$status" -eq 1 ]]
+    [[ "${#lines[@]}" -ge 1 ]]
+}
+
 @test "run with too many parameters" {
     run ../easy-wg-quick foo bar
     [[ "$status" -eq 1 ]]
