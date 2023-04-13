@@ -8,7 +8,7 @@ test_task:
   env:
     CIRRUS_CLONE_DEPTH: 10
   pkginstall_script:
-    - pkg install -y net/wireguard net/wireguard-go graphics/libqrencode
+    - pkg install -y net/wireguard net/wireguard-kmod graphics/libqrencode
     - pkg install -y shells/bash devel/bats-core
   unittests_script:
     - cd tests && ./runtests.bash
