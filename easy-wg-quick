@@ -654,7 +654,7 @@ main() {
     write_initial_configuration
     if test ! -f wghub.conf; then
         # shellcheck disable=SC2154
-        if test -z "$BATS_TEST_NUMBER"; then
+        if test -z "$BATS_VERSION"; then
             echo "The default configuration is written to text files (*.txt)."
             echo "If you want to check or change anything, press Ctrl+C for 10 seconds."
             sleep 10
