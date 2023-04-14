@@ -565,11 +565,7 @@ create_new_client() {
     remove_temporary_client_key_file "$CONF_NAME"
 }
 
-main() {
-    umask 077
-
-    CONF_NAME="$1"
-
+write_initial_configuration() {
     test -f extnetif.txt || create_ext_net_if
     EXT_NET_IF="$(get_ext_net_if)"
     test -f extnetip.txt || create_ext_net_ip "$EXT_NET_IF"
@@ -619,7 +615,52 @@ main() {
     test -f portno.txt || create_port_no
     EXT_NET_PORT="$(get_port_no)"
     test -f wghub.key  || create_hub_key
-    test -f wghub.conf || create_hub_conf
+}
+
+print_usage() {
+    echo "Usage: $0 [client_name] - create new clinet with optional [client_name]"
+    echo "       $0 --init        - create initial configuration without any clients"
+    echo "       $0 --clear       - clear the configuration and start over"
+    exit 1
+}
+
+main() {
+    umask 077
+
+    if test "$#" -ge 2; then
+        print_usage
+    fi
+
+    case "$1" in
+        "-h" | "--help")
+            print_usage
+            ;;
+        "-i" | "--init")
+            write_initial_configuration
+            echo "Check the contents of the *.txt files and adjust them to your needs."
+            echo "Run the script again without --init to continue, or remove these files to start over."
+            exit 0
+            ;;
+        "-c" | "--clear")
+            echo "To start over, manually remove all *.bak *.conf *.key *.psk *.txt files."
+            echo "This script removes nothing."
+            exit 1
+            ;;
+        *)
+            CONF_NAME="$1"
+            ;;
+    esac
+
+    write_initial_configuration
+    if test ! -f wghub.conf; then
+        # shellcheck disable=SC2154
+        if test -z "$BATS_TEST_NUMBER"; then
+            echo "The default configuration is written to text files (*.txt)."
+            echo "If you want to check or change anything, press Ctrl+C for 10 seconds."
+            sleep 10
+        fi
+        create_hub_conf
+    fi
 
     if test -z "$CONF_NAME"; then
         CONF_NAME="$SEQNO"
@@ -631,9 +672,4 @@ main() {
     fi
 }
 
-if test "$#" -ge 2 || test "$1" = "-h" || test "$1" = "--help" ; then
-    echo "Usage: $0 [client_name]"
-    exit 1
-fi
-
-main "$1"
+main "$@"
