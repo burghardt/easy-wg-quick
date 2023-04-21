@@ -307,6 +307,7 @@ compares the features of the alternative implementations.
 | Firewall type | IPv4 MASQ | IPv6 MASQ | IPv6 NDP | TCP MSS clamp |
 | --------------|-----------|-----------|----------|---------------|
 | iptables      | &check;   | &check;   | &check;  | &check;       |
+| nft           | &check;   | &check;   | &check;  | &check;       |
 | ufw           | &check;   | &check;   | &check;  | &check;       |
 | firewalld     | &check;   | &check;   | _        | &check;       |
 | pf            | &check;   | -         | _        | _             |
@@ -316,6 +317,7 @@ File `fwtype.txt` contains name of firewall type. To override autodetection
 or disable any rules run one of the following commands:
 
     echo iptables  > fwtype.txt  # to choose Linux netfilter
+    echo nft       > fwtype.txt  # to choose Linux nftables
     echo firewalld > fwtype.txt  # to choose [firewalld]
     echo ufw       > fwtype.txt  # to choose Uncomplicated Firewall
     echo pf        > fwtype.txt  # to choose OpenBSD PF

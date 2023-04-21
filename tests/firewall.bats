@@ -2,7 +2,7 @@
 
 load teardown setup
 
-@test "run with firewall type set to Linux netfilter" {
+@test "run with firewall type set to Linux iptables" {
     echo iptables > fwtype.txt
     run ../easy-wg-quick
     [[ "$status" -eq 0 ]]
@@ -10,6 +10,16 @@ load teardown setup
     run grep 'iptables -A FORWARD' wghub.conf
     [[ "$status" -eq 0 ]]
     [[ "${lines[0]}" == "PostUp = iptables -I DOCKER-USER -i %i -j ACCEPT || iptables -A FORWARD -i %i -j ACCEPT" ]]
+}
+
+@test "run with firewall type set to Linux nft" {
+    echo nft > fwtype.txt
+    run ../easy-wg-quick
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -gt 10 ]]
+    run grep 'nft add rule inet filter forward' wghub.conf
+    [[ "$status" -eq 0 ]]
+    [[ "${lines[0]}" == "PostUp = nft add rule inet filter forward iifname %i accept" ]]
 }
 
 @test "run with firewall type set to firewalld" {
