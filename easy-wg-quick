@@ -24,7 +24,7 @@
 # For updates visit https://github.com/burghardt/easy-wg-quick
 
 check_if_wg_is_installed() {
-    wg show interfaces >/dev/null 2>&1 || {
+    wg show interfaces > /dev/null 2>&1 || {
         echo 'Unable to use "wg" command. Are WireGuard tools installed?'
         printf 'Read https://github.com/burghardt/easy-wg-quick#prerequisites\n'
         exit 1
@@ -133,17 +133,17 @@ get_sysctl_type() {
 check_if_ipv6_is_available() {
     if test -f forceipv6.txt; then
         echo 'File forceipv6.txt exists. Enabling IPv6 in tunnels!'
-        return  0
+        return 0
     elif test "$(uname -s)" = "FreeBSD" || test "$(uname -s)" = "Darwin"; then
         IPV6ADR=$(ifconfig "$1" | awk '$1 == "inet6" { print $2 }' | grep -v "%$1$")
         test -n "$IPV6ADR" && {
             echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
-            return  0
+            return 0
         }
     elif test "$(uname -s)" = "Linux"; then
-        ip -6 addr | grep -i 'scope global' >/dev/null 2>&1 && {
+        ip -6 addr | grep -i 'scope global' > /dev/null 2>&1 && {
             echo 'Looks like you have IPv6 available. Enabling IPv6 in tunnels!'
-            return  0
+            return 0
         }
     else
         echo 'Unsupported operating system. Unable to detect IPv6 availability.'
@@ -162,14 +162,14 @@ create_seq_no() {
 
 get_seq_no() {
     SEQNO=$(cat seqno.txt)
-    NEXT=$((SEQNO+1))
+    NEXT=$((SEQNO + 1))
     update_seq_no "$NEXT"
     echo "$SEQNO"
 }
 
 create_port_no() {
     echo "No portno.txt... creating one!"
-    (shuf -i 1025-65535 -n 1 || jot -r 1 1025 65535) > portno.txt 2>/dev/null
+    (shuf -i 1025-65535 -n 1 || jot -r 1 1025 65535) > portno.txt 2> /dev/null
     test -s portno.txt || {
         echo 'Unable to assign random port for WireGuard.'
         echo 'Set it manually in portno.txt file and start script again.'
@@ -192,8 +192,8 @@ get_int_net_dns() {
 
 create_int_net_address() {
     echo "No intnetaddress.txt... creating one!"
-    RNDNET1="$( (shuf -i 1-250 -n 1 || jot -r 1 1 250) 2>/dev/null)"
-    RNDNET2="$( (shuf -i 1-250 -n 1 || jot -r 1 1 250) 2>/dev/null)"
+    RNDNET1="$( (shuf -i 1-250 -n 1 || jot -r 1 1 250) 2> /dev/null)"
+    RNDNET2="$( (shuf -i 1-250 -n 1 || jot -r 1 1 250) 2> /dev/null)"
     echo "10.${RNDNET1:-127}.${RNDNET2:-0}." > intnetaddress.txt
 }
 
@@ -230,10 +230,10 @@ get_int_net6_dns() {
 
 create_int_net6_address() {
     echo "No intnet6address.txt... creating one!"
-    RNDGLB1="$( (shuf -i 11-99 -n 1 || jot -r 1 11 99) 2>/dev/null)"
-    RNDGLB2="$( (shuf -i 1111-9999 -n 1 || jot -r 1 1111 9999) 2>/dev/null)"
-    RNDGLB3="$( (shuf -i 1111-9999 -n 1 || jot -r 1 1111 9999) 2>/dev/null)"
-    RNDSUBN="$( (shuf -i 1111-9999 -n 1 || jot -r 1 1111 9999) 2>/dev/null)"
+    RNDGLB1="$( (shuf -i 11-99 -n 1 || jot -r 1 11 99) 2> /dev/null)"
+    RNDGLB2="$( (shuf -i 1111-9999 -n 1 || jot -r 1 1111 9999) 2> /dev/null)"
+    RNDGLB3="$( (shuf -i 1111-9999 -n 1 || jot -r 1 1111 9999) 2> /dev/null)"
+    RNDSUBN="$( (shuf -i 1111-9999 -n 1 || jot -r 1 1111 9999) 2> /dev/null)"
     echo "fd${RNDGLB1:-fc}:${RNDGLB2:-2965}:${RNDGLB3:-0503}:${RNDSUBN:-e2ae}::" > intnet6address.txt
 }
 
@@ -395,7 +395,6 @@ EOF
     echo "Note: customize [Interface] section of wghub.conf if required!"
 }
 
-
 ip2int() {
     { IFS=. read -r a b c d; } << EOF
 $1
@@ -500,13 +499,13 @@ PresharedKey = $(cat "wgclient_$CONF_NAME.psk")
 AllowedIPs = $INT_NET_ADDRESS$SEQNO$INT_NET_ADDRESS_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$1$INT_NET6_ADDRESS_MASK")
 EOF
     if $NET6 && test "$NET6MODE" = "proxy_ndp"; then
-      NEIGHADD="PostUp = ip -6 neigh add proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
-      NEIGHDEL="PostDown = ip -6 neigh del proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
-      sed -i.bak "s/.*net.ipv6.conf.all.proxy_ndp=0.*/&\n$NEIGHADD\n$NEIGHDEL/" wghub.conf
+        NEIGHADD="PostUp = ip -6 neigh add proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
+        NEIGHDEL="PostDown = ip -6 neigh del proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
+        sed -i.bak "s/.*net.ipv6.conf.all.proxy_ndp=0.*/&\n$NEIGHADD\n$NEIGHDEL/" wghub.conf
     fi
 
     echo " done!"
-cat << EOF
+    cat << EOF
 
 Important: Deploy updated wghub.conf configuration to WireGuard with wg-quick:
   sudo wg-quick down ./wghub.conf # if already configured
@@ -556,7 +555,7 @@ create_new_client() {
     CONF_NAME="$2"
 
     create_new_client_conf "$SEQNO" "$CONF_NAME"
-    if qrencode -V >/dev/null 2>&1; then
+    if qrencode -V > /dev/null 2>&1; then
         print_client_qrcode "$CONF_NAME"
     else
         print_client_conf "$CONF_NAME"
@@ -610,11 +609,11 @@ write_initial_configuration() {
     }
 
     check_if_wg_is_installed
-    test -f seqno.txt  || create_seq_no
+    test -f seqno.txt || create_seq_no
     SEQNO="$(get_seq_no)"
     test -f portno.txt || create_port_no
     EXT_NET_PORT="$(get_port_no)"
-    test -f wghub.key  || create_hub_key
+    test -f wghub.key || create_hub_key
 }
 
 print_usage() {
