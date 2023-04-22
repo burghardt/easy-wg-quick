@@ -77,4 +77,3 @@ load teardown setup
     run grep 'ip6tables -t nat -A POSTROUTING' wghub.conf
     [[ "$status" -eq 1 ]]
 }
-
