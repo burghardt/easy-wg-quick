@@ -289,6 +289,32 @@ EOF
     fi
 }
 
+create_nft_rules() {
+    cat << EOF
+PostUp = nft add table inet filter
+PostUp = nft add table ip nat
+PostUp = nft add chain inet filter postrouting "{ type nat hook postrouting priority 100 ; }"
+PostUp = nft add chain inet filter forward "{ type filter hook forward priority 0; }"
+PostUp = nft add chain ip nat postrouting "{ type nat hook postrouting priority 100 ; }"
+PostUp = nft add rule inet filter postrouting ip protocol tcp tcp flags "&(syn|rst)" == syn oifname $EXT_NET_IF tcp option maxseg size set rt mtu
+PostUp = nft add rule ip nat postrouting oifname $EXT_NET_IF masquerade
+PostUp = nft add rule inet filter forward iifname %i accept
+PostUp = nft add rule inet filter forward oifname %i ct state related,established accept
+PostDown = nft delete rule inet filter forward iifname %i accept
+PostDown = nft delete rule inet filter forward oifname %i ct state related,established accept
+PostDown = nft delete rule ip nat postrouting oifname $EXT_NET_IF masquerade
+PostDown = nft delete rule inet filter postrouting ip protocol tcp tcp flags "&(syn|rst)" == syn oifname $EXT_NET_IF tcp option maxseg size set rt mtu
+EOF
+    if $NET6 && test "$NET6MODE" = "masquerade"; then
+        cat << EOF
+PostUp = nft add table ip6 nat
+PostUp = nft add chain ip6 nat postrouting "{ type nat hook postrouting priority 100 ; }"
+PostUp = nft add rule ip6 nat postrouting oifname $EXT_NET_IF masquerade
+PostDown = nft delete rule ip6 nat postrouting oifname $EXT_NET_IF masquerade
+EOF
+    fi
+}
+
 create_firewalld_rules() {
     cat << EOF
 PostUp = firewall-cmd --zone=public --add-port $EXT_NET_PORT/udp
@@ -370,6 +396,8 @@ EOF
 
     if test "$FW_TYPE" = "iptables"; then
         create_iptables_rules >> wghub.conf
+    elif test "$FW_TYPE" = "nft"; then
+        create_nft_rules >> wghub.conf
     elif test "$FW_TYPE" = "firewalld"; then
         create_firewalld_rules >> wghub.conf
     elif test "$FW_TYPE" = "ufw"; then
