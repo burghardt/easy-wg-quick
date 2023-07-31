@@ -17,9 +17,9 @@ load teardown setup
     run ../easy-wg-quick
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -gt 10 ]]
-    run grep 'nft add rule inet filter forward' wghub.conf
+    run grep 'nft add rule inet filter %i-forward' wghub.conf
     [[ "$status" -eq 0 ]]
-    [[ "${lines[0]}" == "PostUp = nft add rule inet filter forward iifname %i accept" ]]
+    [[ "${lines[0]}" == "PostUp = nft add rule inet filter %i-forward iifname %i accept" ]]
 }
 
 @test "run with firewall type set to firewalld" {

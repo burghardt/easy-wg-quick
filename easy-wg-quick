@@ -293,24 +293,23 @@ create_nft_rules() {
     cat << EOF
 PostUp = nft add table inet filter
 PostUp = nft add table ip nat
-PostUp = nft add chain inet filter postrouting "{ type nat hook postrouting priority 100 ; }"
-PostUp = nft add chain inet filter forward "{ type filter hook forward priority 0; }"
-PostUp = nft add chain ip nat postrouting "{ type nat hook postrouting priority 100 ; }"
-PostUp = nft add rule inet filter postrouting ip protocol tcp tcp flags "&(syn|rst)" == syn oifname $EXT_NET_IF tcp option maxseg size set rt mtu
-PostUp = nft add rule ip nat postrouting oifname $EXT_NET_IF masquerade
-PostUp = nft add rule inet filter forward iifname %i accept
-PostUp = nft add rule inet filter forward oifname %i ct state related,established accept
-PostDown = nft delete rule inet filter forward iifname %i accept
-PostDown = nft delete rule inet filter forward oifname %i ct state related,established accept
-PostDown = nft delete rule ip nat postrouting oifname $EXT_NET_IF masquerade
-PostDown = nft delete rule inet filter postrouting ip protocol tcp tcp flags "&(syn|rst)" == syn oifname $EXT_NET_IF tcp option maxseg size set rt mtu
+PostUp = nft add chain inet filter %i-postrouting "{ type nat hook postrouting priority 100 ; }"
+PostUp = nft add chain inet filter %i-forward "{ type filter hook forward priority 0; }"
+PostUp = nft add chain ip nat %i-postrouting "{ type nat hook postrouting priority 100 ; }"
+PostUp = nft add rule inet filter %i-postrouting ip protocol tcp tcp flags "&(syn|rst)" == syn oifname $EXT_NET_IF tcp option maxseg size set rt mtu
+PostUp = nft add rule ip nat %i-postrouting oifname $EXT_NET_IF masquerade
+PostUp = nft add rule inet filter %i-forward iifname %i accept
+PostUp = nft add rule inet filter %i-forward oifname %i ct state related,established accept
+PostDown = nft delete chain inet filter %i-postrouting
+PostDown = nft delete chain inet filter %i-forward
+PostDown = nft delete chain ip nat %i-postrouting
 EOF
     if $NET6 && test "$NET6MODE" = "masquerade"; then
         cat << EOF
 PostUp = nft add table ip6 nat
-PostUp = nft add chain ip6 nat postrouting "{ type nat hook postrouting priority 100 ; }"
-PostUp = nft add rule ip6 nat postrouting oifname $EXT_NET_IF masquerade
-PostDown = nft delete rule ip6 nat postrouting oifname $EXT_NET_IF masquerade
+PostUp = nft add chain ip6 nat %i-postrouting "{ type nat hook postrouting priority 100 ; }"
+PostUp = nft add rule ip6 nat %i-postrouting oifname $EXT_NET_IF masquerade
+PostDown = nft delete chain ip6 nat %i-postrouting
 EOF
     fi
 }
