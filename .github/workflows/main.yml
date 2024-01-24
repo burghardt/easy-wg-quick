@@ -7,32 +7,40 @@ on:
     - cron:  '0 0 * * *'
 
 jobs:
-  build:
-    name: sca
+  sast:
+    name: sast
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
       - name: shellcheck
         uses: ./.github/actions/shellcheck
       - name: shfmt
         uses: ./.github/actions/shfmt
       - name: checkbashisms
         uses: ./.github/actions/checkbashisms
-  test:
+  tests:
     name: tests
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
       - name: unit tests
         uses: ./.github/actions/bats
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: docker
+        run: docker build . --tag ${{ github.event.repository.name }}:$(date +%s)
   macos:
     name: macos
     runs-on: macos-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
       - name: brew bundle
         run: brew bundle
       - name: unit tests
@@ -59,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@v4
       - name: install wireguard
         run: sudo apt install -y wireguard-tools
       - name: create wghub.conf

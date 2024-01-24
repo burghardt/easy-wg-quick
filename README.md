@@ -2,6 +2,7 @@
 easy-wg-quick - Creates WireGuard configuration for hub and peers with ease
 
  * [Getting Started](#getting-started)
+   * [Docker](#docker)
    * [Terraform](#terraform)
    * [Prerequisites](#prerequisites)
    * [Installing](#installing)
@@ -32,6 +33,18 @@ These instructions will get you a copy of the project up and running on your
 local machine. This machine (called hub) will act as VPN concentrator. All
 other peers connects to hub (as in a "road warrior" configuration).
 
+### Docker
+
+A Docker container image based on Alpine Linux, [WireGuard] tools
+and [libqrencode] is available from `ghcr.io`.
+
+    curl -4 ifconfig.co/ip > extnetip.txt
+    docker run --rm -it -v "$PWD:/pwd" ghcr.io/burghardt/easy-wg-quick
+
+Please note that `extnetip.txt` must be populated with the server IP via
+the cURL command above or manually if you use the generated configuration
+on the host (instead of the container).
+
 ### Terraform
 
 Terraform code for deploying `easy-wg-quick` in the Google Cloud Platform
@@ -58,7 +71,7 @@ to generate [QR codes] for mobile applications.
 
 #### FreeBSD
 
-    sudo pkg install net/wireguard graphics/libqrencode
+    sudo pkg install net/wireguard-tools graphics/libqrencode
 
 #### macOS
 
@@ -445,32 +458,33 @@ details.
 
 OpenVPN's [easy-rsa] was an inspiration for writing this script.
 
-[tf-gcp-easy-wg-quick]: https://github.com/burghardt/tf-gcp-easy-wg-quick
-[WireGuard]: https://www.wireguard.com/
-[local machine]: https://www.wireguard.com/install/
-[router]: https://openwrt.org/docs/guide-user/services/vpn/wireguard
-[VPS]: https://en.wikipedia.org/wiki/Virtual_private_server
-[container]: https://github.com/activeeos/wireguard-docker
-[QR codes]: https://en.wikipedia.org/wiki/QR_code
-[wireguard.com/install]: https://www.wireguard.com/install/
 [Android]: https://play.google.com/store/apps/details?id=com.wireguard.android
-[iOS]: https://itunes.apple.com/us/app/wireguard/id1441195209?ls=1&mt=8
-[OpenWRT clients]: https://openwrt.org/docs/guide-user/services/vpn/wireguard/client
-[UCI]: https://openwrt.org/docs/techref/uci
-[OpenWRT]: https://openwrt.org/
-[air gapped]: https://en.wikipedia.org/wiki/Air_gap_%28networking%29
-[ifconfig.co]: https://ifconfig.co/
-[split tunneling]: https://en.wikipedia.org/wiki/Split_tunneling
-[firewalld]: https://firewalld.org/
-[Docker]: https://success.docker.com/article/ipv4-forwarding
-[elsewhere]: https://en.wikipedia.org/wiki/Sysctl
-[issues and limitations]: https://en.wikipedia.org/wiki/Network_address_translation#Issues_and_limitations
-[Neighbor Discovery]: https://en.wikipedia.org/wiki/Neighbor_Discovery_Protocol
-[Proxies (ND Proxy, NDP Proxy)]: https://tools.ietf.org/html/rfc4389
-[end-to-end connectivity]: https://en.wikipedia.org/wiki/End-to-end_principle
-[Pi-hole]: https://pi-hole.net/
 [Cloudflare DNS over TLS]: https://github.com/qdm12/cloudflare-dns-server
-[Systemd]: https://wiki.debian.org/systemd
-[native support]: https://manpages.debian.org/buster/systemd/systemd.netdev.5.en.html#%5BWIREGUARD%5D_SECTION_OPTIONS
+[Docker]: https://success.docker.com/article/ipv4-forwarding
 [LICENSE]: LICENSE
+[Neighbor Discovery]: https://en.wikipedia.org/wiki/Neighbor_Discovery_Protocol
+[OpenWRT clients]: https://openwrt.org/docs/guide-user/services/vpn/wireguard/client
+[OpenWRT]: https://openwrt.org/
+[Pi-hole]: https://pi-hole.net/
+[Proxies (ND Proxy, NDP Proxy)]: https://tools.ietf.org/html/rfc4389
+[QR codes]: https://en.wikipedia.org/wiki/QR_code
+[Systemd]: https://wiki.debian.org/systemd
+[UCI]: https://openwrt.org/docs/techref/uci
+[VPS]: https://en.wikipedia.org/wiki/Virtual_private_server
+[WireGuard]: https://www.wireguard.com/
+[air gapped]: https://en.wikipedia.org/wiki/Air_gap_%28networking%29
+[container]: https://github.com/activeeos/wireguard-docker
 [easy-rsa]: https://github.com/OpenVPN/easy-rsa
+[elsewhere]: https://en.wikipedia.org/wiki/Sysctl
+[end-to-end connectivity]: https://en.wikipedia.org/wiki/End-to-end_principle
+[firewalld]: https://firewalld.org/
+[iOS]: https://itunes.apple.com/us/app/wireguard/id1441195209?ls=1&mt=8
+[ifconfig.co]: https://ifconfig.co/
+[issues and limitations]: https://en.wikipedia.org/wiki/Network_address_translation#Issues_and_limitations
+[libqrencode]: https://github.com/fukuchi/libqrencode
+[local machine]: https://www.wireguard.com/install/
+[native support]: https://manpages.debian.org/buster/systemd/systemd.netdev.5.en.html#%5BWIREGUARD%5D_SECTION_OPTIONS
+[router]: https://openwrt.org/docs/guide-user/services/vpn/wireguard/start
+[split tunneling]: https://en.wikipedia.org/wiki/Split_tunneling
+[tf-gcp-easy-wg-quick]: https://github.com/burghardt/tf-gcp-easy-wg-quick
+[wireguard.com/install]: https://www.wireguard.com/install/
