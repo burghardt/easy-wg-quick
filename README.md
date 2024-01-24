@@ -71,7 +71,7 @@ to generate [QR codes] for mobile applications.
 
 #### FreeBSD
 
-    sudo pkg install net/wireguard graphics/libqrencode
+    sudo pkg install net/wireguard-tools graphics/libqrencode
 
 #### macOS
 
