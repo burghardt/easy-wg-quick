@@ -2,6 +2,7 @@
 easy-wg-quick - Creates WireGuard configuration for hub and peers with ease
 
  * [Getting Started](#getting-started)
+   * [Docker](#docker)
    * [Terraform](#terraform)
    * [Prerequisites](#prerequisites)
    * [Installing](#installing)
@@ -31,6 +32,18 @@ easy-wg-quick - Creates WireGuard configuration for hub and peers with ease
 These instructions will get you a copy of the project up and running on your
 local machine. This machine (called hub) will act as VPN concentrator. All
 other peers connects to hub (as in a "road warrior" configuration).
+
+### Docker
+
+A Docker container image based on Alpine Linux, [WireGuard] tools
+and [libqrencode] is available from `ghcr.io`.
+
+    curl -4 ifconfig.co/ip > extnetip.txt
+    docker run --rm -it -v "$PWD:/pwd" ghcr.io/burghardt/easy-wg-quick
+
+Please note that `extnetip.txt` must be populated with the server IP via
+the cURL command above or manually if you use the generated configuration
+on the host (instead of the container).
 
 ### Terraform
 
@@ -474,3 +487,4 @@ OpenVPN's [easy-rsa] was an inspiration for writing this script.
 [native support]: https://manpages.debian.org/buster/systemd/systemd.netdev.5.en.html#%5BWIREGUARD%5D_SECTION_OPTIONS
 [LICENSE]: LICENSE
 [easy-rsa]: https://github.com/OpenVPN/easy-rsa
+[libqrencode]: https://github.com/fukuchi/libqrencode
