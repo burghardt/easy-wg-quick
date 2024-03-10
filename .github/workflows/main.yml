@@ -1,4 +1,4 @@
-name: easy-wg-quick workflow
+name: Main
 
 on:
   push:
