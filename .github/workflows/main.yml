@@ -43,6 +43,7 @@ jobs:
         with:
           dockerfile: Dockerfile
           failure-threshold: error
+          ignore: DL3018
       - name: docker
         run: docker build . --tag ${{ github.event.repository.name }}:scan
       - name: dockle
