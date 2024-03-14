@@ -38,8 +38,21 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
+      - name: hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: Dockerfile
+          failure-threshold: error
+          ignore: DL3018
       - name: docker
-        run: docker build . --tag ${{ github.event.repository.name }}:$(date +%s)
+        run: docker build . --tag ${{ github.event.repository.name }}:scan
+      - name: dockle
+        uses: goodwithtech/dockle-action@v0.1.2
+        with:
+          image: ${{ github.event.repository.name }}:scan
+          format: list
+          ignore: CIS-DI-0001
+          exit-code: 1
   macos:
     name: macos
     runs-on: macos-latest
