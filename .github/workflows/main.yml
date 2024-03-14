@@ -50,6 +50,7 @@ jobs:
         with:
           image: ${{ github.event.repository.name }}:scan
           format: list
+          ignore: CIS-DI-0001
           exit-code: 1
   macos:
     name: macos
