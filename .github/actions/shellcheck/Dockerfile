@@ -6,7 +6,7 @@ ENV LANGUAGE en_US
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update && \
-    apt-get install -y locales && \
+    apt-get install -y --no-install-recommends locales && \
     locale-gen $LANG && \
     apt-get full-upgrade -y && \
     apt-get install -y --no-install-recommends shellcheck && \
