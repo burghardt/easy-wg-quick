@@ -46,13 +46,17 @@ jobs:
           ignore: DL3018
       - name: docker
         run: docker build . --tag ${{ github.event.repository.name }}:scan
+      - name: install dockle
+        run: |
+          VERSION=$(
+            curl --silent "https://api.github.com/repos/goodwithtech/dockle/releases/latest" | \
+            grep '"tag_name":' | \
+            sed -E 's/.*"v([^"]+)".*/\1/' \
+          ) && curl -L -o dockle.deb https://github.com/goodwithtech/dockle/releases/download/v${VERSION}/dockle_${VERSION}_Linux-64bit.deb
+          sudo dpkg -i dockle.deb && rm dockle.deb
       - name: dockle
-        uses: goodwithtech/dockle-action@v0.1.2
-        with:
-          image: ${{ github.event.repository.name }}:scan
-          format: list
-          ignore: CIS-DI-0001
-          exit-code: 1
+        run: |
+          dockle --exit-code 1 --format list --ignore CIS-DI-0001 ${{ github.event.repository.name }}:scan
   macos:
     name: macos
     runs-on: macos-latest
