@@ -51,7 +51,7 @@ load teardown setup
         skip "as Linux specific"
     fi
 
-    if ! ufw version >/dev/null 2>&1 ; then
+    if ! ufw version > /dev/null 2>&1; then
         skip "as requires ufw installed"
     fi
 
