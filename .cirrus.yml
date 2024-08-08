@@ -31,9 +31,9 @@ test_task:
   check_for_empty_files_script:
     - ls *.txt *.key *.conf | xargs -tn1 test -s
   setup_wireguard_interface_script:
-    - wg-quick up ./wghub.conf
+    - /usr/local/sbin/wg-quick up ./wghub.conf
   check_interface_script:
     - ifconfig wghub
     - wg show
   teardown_wireguard_interface_script:
-    - wg-quick down ./wghub.conf
+    - /usr/local/sbin/wg-quick down ./wghub.conf
