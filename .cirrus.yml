@@ -4,14 +4,16 @@ test_task:
   freebsd_instance:
     matrix:
       image_family: freebsd-15-0-snap
-      # disabled 14.x due to wg-quick: command not found error
-      #image_family: freebsd-14-1
+      image_family: freebsd-14-1
       image_family: freebsd-13-3
   env:
     CIRRUS_CLONE_DEPTH: 10
   pkginstall_script:
     - pkg install -y net/wireguard-tools graphics/libqrencode
     - pkg install -y shells/bash devel/bats-core
+  wg-quick_install_from_git_script:
+    - wget -O /usr/local/sbin/wg-quick https://raw.githubusercontent.com/WireGuard/wireguard-tools/master/src/wg-quick/freebsd.bash
+    - chmod 0755 /usr/local/sbin/wg-quick
   kldload_if_wg_script:
     - kldload if_wg || true
   unittests_script:
