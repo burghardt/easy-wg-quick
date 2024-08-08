@@ -291,25 +291,24 @@ EOF
 
 create_nft_rules() {
     cat << EOF
-PostUp = nft add table inet filter
-PostUp = nft add table ip nat
-PostUp = nft add chain inet filter %i-postrouting "{ type nat hook postrouting priority 100 ; }"
-PostUp = nft add chain inet filter %i-forward "{ type filter hook forward priority 0; }"
-PostUp = nft add chain ip nat %i-postrouting "{ type nat hook postrouting priority 100 ; }"
-PostUp = nft add rule inet filter %i-postrouting ip protocol tcp tcp flags "&(syn|rst)" == syn oifname $EXT_NET_IF tcp option maxseg size set rt mtu
-PostUp = nft add rule ip nat %i-postrouting oifname $EXT_NET_IF masquerade
-PostUp = nft add rule inet filter %i-forward iifname %i accept
-PostUp = nft add rule inet filter %i-forward oifname %i ct state related,established accept
-PostDown = nft delete chain inet filter %i-postrouting
-PostDown = nft delete chain inet filter %i-forward
-PostDown = nft delete chain ip nat %i-postrouting
+PostUp = nft add table inet easy-wg-quick-%i
+PostUp = nft add chain inet easy-wg-quick-%i forward "{ type filter hook forward priority 0; }"
+PostUp = nft add rule inet easy-wg-quick-%i forward iifname %i accept
+PostUp = nft add rule inet easy-wg-quick-%i forward oifname %i ct state related,established accept
+PostUp = nft add chain inet easy-wg-quick-%i postrouting "{ type nat hook postrouting priority 0; }"
+PostUp = nft add rule inet easy-wg-quick-%i postrouting ip protocol tcp tcp flags "&(syn|rst)" == syn oifname $EXT_NET_IF tcp option maxseg size set rt mtu
+PostUp = nft add table ip easy-wg-quick-%i
+PostUp = nft add chain ip easy-wg-quick-%i postrouting "{ type nat hook postrouting priority 0; }"
+PostUp = nft add rule ip easy-wg-quick-%i postrouting oifname $EXT_NET_IF masquerade
+PostDown = nft delete table inet easy-wg-quick-%i
+PostDown = nft delete table ip easy-wg-quick-%i
 EOF
     if $NET6 && test "$NET6MODE" = "masquerade"; then
         cat << EOF
-PostUp = nft add table ip6 nat
-PostUp = nft add chain ip6 nat %i-postrouting "{ type nat hook postrouting priority 100 ; }"
-PostUp = nft add rule ip6 nat %i-postrouting oifname $EXT_NET_IF masquerade
-PostDown = nft delete chain ip6 nat %i-postrouting
+PostUp = nft add table ip6 easy-wg-quick-%i
+PostUp = nft add chain ip6 easy-wg-quick-%i postrouting "{ type nat hook postrouting priority 0; }"
+PostUp = nft add rule ip6 easy-wg-quick-%i postrouting oifname $EXT_NET_IF masquerade
+PostDown = nft delete table ip6 easy-wg-quick-%i
 EOF
     fi
 }
