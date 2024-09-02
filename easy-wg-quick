@@ -677,7 +677,7 @@ download_and_install_wg_quick() {
     }
 
     if test "$(id -u)" -eq 0; then
-        DESTDIR="/usr/local/bin"
+        DESTDIR="/usr/local/sbin"
     else
         DESTDIR="${HOME}/.local/bin"
         mkdir -p "$DESTDIR"

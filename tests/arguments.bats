@@ -77,7 +77,7 @@ load teardown setup
     [[ "${#lines[@]}" -ge 0 ]]
 
     if [[ "$(id -u)" -eq 0 ]]; then
-        [[ -x /usr/local/bin/wg-quick ]]
+        [[ -x /usr/local/sbin/wg-quick ]]
     else
         [[ -x "${HOME}/.local/bin/wg-quick" ]]
     fi
@@ -89,7 +89,7 @@ load teardown setup
     [[ "${#lines[@]}" -ge 0 ]]
 
     if [[ "$(id -u)" -eq 0 ]]; then
-        [[ -x /usr/local/bin/wg-quick ]]
+        [[ -x /usr/local/sbin/wg-quick ]]
     else
         [[ -x "${HOME}/.local/bin/wg-quick" ]]
     fi
