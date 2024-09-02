@@ -14,6 +14,7 @@ RUN apt-get update && \
         qrencode \
         bash \
         bats \
+        ca-certificates \
         wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
