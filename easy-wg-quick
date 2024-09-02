@@ -642,10 +642,60 @@ write_initial_configuration() {
     test -f wghub.key || create_hub_key
 }
 
+download_and_install_wg_quick() {
+    WGQUICKURL="https://raw.githubusercontent.com/WireGuard/wireguard-tools/master/src/wg-quick"
+    if test "$(uname -s)" = "FreeBSD"; then
+        WGQUICKURL="${WGQUICKURL}/freebsd.bash"
+    elif test "$(uname -s)" = "OpenBSD"; then
+        WGQUICKURL="${WGQUICKURL}/openbsd.bash"
+    elif test "$(uname -s)" = "Darwin"; then
+        WGQUICKURL="${WGQUICKURL}/darwin.bash"
+    elif test "$(uname -s)" = "Linux"; then
+        WGQUICKURL="${WGQUICKURL}/linux.bash"
+    else
+        echo 'Unsupported operating system.'
+        echo "Unable to download wg-quick script for $(uname -s)."
+        exit 1
+    fi
+
+    DLFILE=$(mktemp -qt 'wg-quick.XXXXXXXXXX') || {
+        echo "Failed to create temporary file."
+        exit 1
+    }
+    cleanup() {
+        # until https://github.com/koalaman/shellcheck/issues/2660 resolved
+        # shellcheck disable=SC2317
+        rm -f "${DLFILE}"
+    }
+    trap cleanup EXIT
+
+    curl -sL "${WGQUICKURL}" -o "${DLFILE}" > /dev/null 2>&1 ||
+        wget -qO "${DLFILE}" "${WGQUICKURL}" > /dev/null 2>&1 ||
+        fetch -qR -o "${DLFILE}" "${WGQUICKURL}" > /dev/null 2>&1 || {
+        echo "Download of ${WGQUICKURL} failed."
+        exit 1
+    }
+
+    if test "$(id -u)" -eq 0; then
+        DESTDIR="/usr/local/bin"
+    else
+        DESTDIR="${HOME}/.local/bin"
+        mkdir -p "$DESTDIR"
+    fi
+
+    echo "Installing wg-quick to ${DESTDIR}."
+    chmod +x "${DLFILE}"
+    mv "${DLFILE}" "${DESTDIR}/wg-quick" || {
+        echo "Failed to install ${DLFILE} as ${DESTDIR}/wg-quick."
+        exit 1
+    }
+}
+
 print_usage() {
     echo "Usage: $0 [client_name] - create new client with optional [client_name]"
-    echo "       $0 --init        - create initial configuration without any clients"
-    echo "       $0 --clear       - clear the configuration and start over"
+    echo "       $0 -i / --init   - create initial configuration without any clients"
+    echo "       $0 -c / --clear  - clear the configuration and start over"
+    echo "       $0 -d / --install-wg-quick - download and install wg-quick script"
     exit 1
 }
 
@@ -670,6 +720,10 @@ main() {
             echo "To start over, manually remove all *.bak *.conf *.key *.psk *.txt files."
             echo "This script removes nothing."
             exit 1
+            ;;
+        "-d" | "--install-wg-quick")
+            download_and_install_wg_quick
+            exit 0
             ;;
         *)
             CONF_NAME="$1"

@@ -71,6 +71,30 @@ load teardown setup
     [[ "${#lines[@]}" -ge 1 ]]
 }
 
+@test "run with -d parameter" {
+    run ../easy-wg-quick -d
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -ge 0 ]]
+
+    if [[ "$(id -u)" -eq 0 ]]; then
+        [[ -x /usr/local/bin/wg-quick ]]
+    else
+        [[ -x "${HOME}/.local/bin/wg-quick" ]]
+    fi
+}
+
+@test "run with --install-wg-quick parameter" {
+    run ../easy-wg-quick --install-wg-quick
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -ge 0 ]]
+
+    if [[ "$(id -u)" -eq 0 ]]; then
+        [[ -x /usr/local/bin/wg-quick ]]
+    else
+        [[ -x "${HOME}/.local/bin/wg-quick" ]]
+    fi
+}
+
 @test "run with too many parameters" {
     run ../easy-wg-quick foo bar
     [[ "$status" -eq 1 ]]
