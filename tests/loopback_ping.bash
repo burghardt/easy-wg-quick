@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # create configuration
 sudo ip netns exec hub ../easy-wg-quick loop
 

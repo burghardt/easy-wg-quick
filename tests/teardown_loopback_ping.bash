@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # cleanup
 sudo ip link delete veth_hub
 sudo ip link delete veth_client

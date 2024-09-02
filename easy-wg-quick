@@ -465,7 +465,7 @@ MTU = $INT_NET_MTU
 [Peer]
 PublicKey = $(wg pubkey < wghub.key)
 PresharedKey = $(wg genpsk | tee "wgclient_$CONF_NAME.psk")
-AllowedIPs = $INT_NET_CLINET_ALLOWEDIPS
+AllowedIPs = $INT_NET_CLIENT_ALLOWEDIPS
 Endpoint = $EXT_NET_IP:$EXT_NET_PORT
 PersistentKeepalive = 25
 EOF
@@ -496,7 +496,7 @@ $($NET6 && echo "	list dns '$INT_NET6_DNS'")
 	option mtu '$INT_NET_MTU'
 
 config wireguard_wg0
-$(allowedips_to_uci_list "$INT_NET_CLINET_ALLOWEDIPS")
+$(allowedips_to_uci_list "$INT_NET_CLIENT_ALLOWEDIPS")
 	option route_allowed_ips '1'
 	option endpoint_host '$EXT_NET_IP'
 	option endpoint_port '$EXT_NET_PORT'
@@ -612,7 +612,7 @@ write_initial_configuration() {
     INT_NET_ADDRESS_MASK="/32"
     INT_NET_HUB_IP="${INT_NET_ADDRESS}1"
     test -f intnetallowedips.txt || create_client_allowedips
-    INT_NET_CLINET_ALLOWEDIPS="$(get_client_allowedips)"
+    INT_NET_CLIENT_ALLOWEDIPS="$(get_client_allowedips)"
 
     test -f fwtype.txt || create_fw_type
     FW_TYPE="$(get_fw_type)"
@@ -643,7 +643,7 @@ write_initial_configuration() {
 }
 
 print_usage() {
-    echo "Usage: $0 [client_name] - create new clinet with optional [client_name]"
+    echo "Usage: $0 [client_name] - create new client with optional [client_name]"
     echo "       $0 --init        - create initial configuration without any clients"
     echo "       $0 --clear       - clear the configuration and start over"
     exit 1

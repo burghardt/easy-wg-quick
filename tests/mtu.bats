@@ -13,7 +13,7 @@ load teardown setup
     [[ "$status" -eq 0 ]]
 }
 
-@test "run with too smal MTU set" {
+@test "run with too small MTU set" {
     echo 1200 > intnetmtu.txt
     run ../easy-wg-quick toosmalmtu
     [[ "$status" -eq 1 ]]
