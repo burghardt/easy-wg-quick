@@ -20,9 +20,9 @@ test_task:
     - cd tests && ./runtests.bash
   configure_script:
     - echo none > fwtype.txt
-  1st_test_run_script:
+  first_test_run_script:
     - ./easy-wg-quick
-  2nd_test_run_script:
+  second_test_run_script:
     - ./easy-wg-quick named_client
   dump_configuration_script:
     - head *.txt *.key *.conf

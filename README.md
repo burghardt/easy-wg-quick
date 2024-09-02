@@ -231,7 +231,7 @@ set interface name in `extnetif.txt` file with command:
 By default `easy-wg-quick` uses IP address of interface that has default
 routing done over it as external IP address of VPN hub. This might not be true
 if hub is behind firewall or NAT/PAT/masquarading is done. User can set
-prefered IP address in `extnetip.txt` file with command:
+preferred IP address in `extnetip.txt` file with command:
 
     echo 192.168.1.2 > extnetip.txt
 

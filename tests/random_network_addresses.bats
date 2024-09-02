@@ -7,7 +7,7 @@ load teardown setup
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -gt 10 ]]
     run cat intnetaddress.txt
-    saved_1st_output="$output"
+    saved_first_output="$output"
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -eq 1 ]]
 
@@ -16,11 +16,11 @@ load teardown setup
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -gt 10 ]]
     run cat intnetaddress.txt
-    saved_2nd_output="$output"
+    saved_second_output="$output"
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -eq 1 ]]
 
-    [[ "$saved_1st_output" != "$saved_2nd_output" ]]
+    [[ "$saved_first_output" != "$saved_second_output" ]]
 }
 
 @test "run to create random IPv6 network address" {
@@ -29,7 +29,7 @@ load teardown setup
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -gt 10 ]]
     run cat intnet6address.txt
-    saved_1st_output="$output"
+    saved_first_output="$output"
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -eq 1 ]]
 
@@ -38,9 +38,9 @@ load teardown setup
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -gt 10 ]]
     run cat intnet6address.txt
-    saved_2nd_output="$output"
+    saved_second_output="$output"
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -eq 1 ]]
 
-    [[ "$saved_1st_output" != "$saved_2nd_output" ]]
+    [[ "$saved_first_output" != "$saved_second_output" ]]
 }

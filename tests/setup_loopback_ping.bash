@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # create namespaces
 sudo ip netns add hub
 sudo ip netns add client
