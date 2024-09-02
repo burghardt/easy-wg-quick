@@ -13,7 +13,8 @@ RUN apt-get update && \
         iproute2 \
         qrencode \
         bash \
-        bats && \
+        bats \
+        wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
