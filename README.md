@@ -7,6 +7,7 @@ easy-wg-quick - Creates WireGuard configuration for hub and peers with ease
    * [Prerequisites](#prerequisites)
    * [Installing](#installing)
  * [Usage](#usage)
+   * [Special usage](#special-usage)
    * [Sample output](#sample-output)
    * [Using generated configuration](#using-generated-configuration)
  * [Fine tuning](#fine-tuning)
