@@ -1,6 +1,6 @@
 #!/bin/sh
 # easy-wg-quick - Creates WireGuard configuration for hub and peers with ease
-# Copyright (C) 2019-2023 Krzysztof Burghardt <krzysztof@burghardt.pl>
+# Copyright (C) 2019-2024 Krzysztof Burghardt <krzysztof@burghardt.pl>
 #
 #
 # License
@@ -691,11 +691,49 @@ download_and_install_wg_quick() {
     }
 }
 
+upgrade_easy_wg_quick() {
+    REPO='burghardt/easy-wg-quick'
+    APIURL="https://api.github.com/repos/${REPO}/releases/latest"
+
+    APIDATA="$(curl -sL "${APIURL}" ||
+        wget -qO- "${APIURL}" ||
+        fetch -qo- "${APIURL}")"
+    TAG="$(echo "${APIDATA}" | grep -oP '"tag_name": "\K(.*?)(?=")')"
+    DLURL="https://raw.githubusercontent.com/${REPO}/${TAG}/easy-wg-quick"
+
+    DLFILE=$(mktemp -qt 'wg-quick.XXXXXXXXXX') || {
+        echo "Failed to create temporary file."
+        exit 1
+    }
+    cleanup() {
+        # until https://github.com/koalaman/shellcheck/issues/2660 resolved
+        # shellcheck disable=SC2317
+        rm -f "${DLFILE}"
+    }
+    trap cleanup EXIT
+
+    curl -sL "${DLURL}" -o "${DLFILE}" > /dev/null 2>&1 ||
+        wget -qO "${DLFILE}" "${DLURL}" > /dev/null 2>&1 ||
+        fetch -q -o "${DLFILE}" "${DLURL}" > /dev/null 2>&1 || {
+        echo "Download of ${DLURL} failed."
+        exit 1
+    }
+
+    echo "Installing easy-wg-quick ${TAG} to $0."
+    chmod +x "${DLFILE}"
+    mv "${DLFILE}" "$0" || {
+        echo "Failed to install ${DLFILE} as $0."
+        exit 1
+    }
+    true
+}
+
 print_usage() {
     echo "Usage: $0 [client_name] - create new client with optional [client_name]"
     echo "       $0 -i / --init   - create initial configuration without any clients"
     echo "       $0 -c / --clear  - clear the configuration and start over"
     echo "       $0 -d / --install-wg-quick - download and install wg-quick script"
+    echo "       $0 -u / --upgrade - update $0 from latest GitHub release"
     exit 1
 }
 
@@ -723,6 +761,10 @@ main() {
             ;;
         "-d" | "--install-wg-quick")
             download_and_install_wg_quick
+            exit 0
+            ;;
+        "-u" | "--upgrade")
+            upgrade_easy_wg_quick
             exit 0
             ;;
         *)
