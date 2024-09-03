@@ -117,6 +117,39 @@ Following command will create `wgclient_client_name.conf` file.
 
     ./easy-wg-quick client_name
 
+### Special usage
+
+#### -h / --help
+
+Displays help for all supported arguments.
+
+#### -i / --init
+
+Writes the initial configuration to text files without creating a client or
+hub configuration. This option is useful if you want to change auto-detected
+or default configuration values. Repeat the script with the client name to
+create the final configuration.
+
+#### -c / --clear
+
+To start over, manually remove all `*.bak`, `*.conf`, `*.key`, and `*.psk`
+files. If you need to remove initial configuration options as well, also
+delete all `*.txt` files. This script does not remove anything.
+
+#### -d / --install-wg-quick
+
+This option will download and install the wg-quick script from the official
+Wireguard GitHub mirror based on the current operating system (Linux, FreeBSD,
+OpenBSD and Darwin are supported).
+
+If run as `root`, it will install `wg-quick` in `/usr/local/sbin`. If run as
+a normal user, it will use `$HOME/.local/bin`.
+
+#### -u / --upgrade
+
+This will download the latest release of that script and replace the original
+file with the downloaded version.
+
 ### Sample output
 
 ```
