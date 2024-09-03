@@ -695,8 +695,8 @@ upgrade_easy_wg_quick() {
     REPO='burghardt/easy-wg-quick'
     APIURL="https://api.github.com/repos/${REPO}/releases/latest"
 
-    APIDATA="$(curl -sL "${APIURL}" || \
-        wget -qO- "${APIURL}" || \
+    APIDATA="$(curl -sL "${APIURL}" ||
+        wget -qO- "${APIURL}" ||
         fetch -qo- "${APIURL}")"
     TAG="$(echo "${APIDATA}" | grep -oP '"tag_name": "\K(.*?)(?=")')"
     DLURL="https://raw.githubusercontent.com/${REPO}/${TAG}/easy-wg-quick"
