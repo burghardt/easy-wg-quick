@@ -5,7 +5,7 @@ test_task:
     matrix:
       image_family: freebsd-15-0-snap
       image_family: freebsd-14-1
-      image_family: freebsd-13-3
+      image_family: freebsd-13-4
   env:
     CIRRUS_CLONE_DEPTH: 10
   pkginstall_script:
