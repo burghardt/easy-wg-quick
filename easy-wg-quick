@@ -444,9 +444,20 @@ create_new_client_ip() {
 $1
 EOF
     seqno=$2
+    output_format=${3:-"full"} # Default to "full" (IP/mask), can be "ip" for IP only
+
     bitmask=$((0xffffffff << (32 - netmask)))
     addr=$(($(ip2int "$ip") + (seqno & ~bitmask)))
-    echo "$(int2ip "$addr")/$netmask"
+    calculated_ip="$(int2ip "$addr")"
+
+    case "$output_format" in
+        "ip")
+            echo "$calculated_ip"
+            ;;
+        "full" | *)
+            echo "$calculated_ip/$netmask"
+            ;;
+    esac
 }
 
 create_new_client_conf_wg_quick() {
@@ -522,7 +533,7 @@ add_client_to_hub_conf() {
 [Peer]
 PublicKey = $(wg pubkey < "wgclient_$CONF_NAME.key")
 PresharedKey = $(cat "wgclient_$CONF_NAME.psk")
-AllowedIPs = $INT_NET_ADDRESS$SEQNO$INT_NET_ADDRESS_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$1$INT_NET6_ADDRESS_MASK")
+AllowedIPs = $(create_new_client_ip "${INT_NET_ADDRESS}0$INT_NET_MASK" "$SEQNO" "ip")$INT_NET_ADDRESS_MASK$($NET6 && echo ", $INT_NET6_ADDRESS$1$INT_NET6_ADDRESS_MASK")
 EOF
     if $NET6 && test "$NET6MODE" = "proxy_ndp"; then
         NEIGHADD="PostUp = ip -6 neigh add proxy $INT_NET6_ADDRESS$1 dev $EXT_NET_IF"
