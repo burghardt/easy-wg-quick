@@ -11,6 +11,7 @@ test_task:
   pkginstall_script:
     - pkg install -y net/wireguard-tools graphics/libqrencode
     - pkg install -y shells/bash devel/bats-core
+    - pkg install -y security/ca_root_nss
   kldload_if_wg_script:
     - kldload if_wg || true
   unittests_script:
