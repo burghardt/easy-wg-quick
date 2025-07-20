@@ -444,7 +444,7 @@ create_new_client_ip() {
 $1
 EOF
     seqno=$2
-    output_format=${3:-"full"}  # Default to "full" (IP/mask), can be "ip" for IP only
+    output_format=${3:-"full"} # Default to "full" (IP/mask), can be "ip" for IP only
 
     bitmask=$((0xffffffff << (32 - netmask)))
     addr=$(($(ip2int "$ip") + (seqno & ~bitmask)))
@@ -454,7 +454,7 @@ EOF
         "ip")
             echo "$calculated_ip"
             ;;
-        "full"|*)
+        "full" | *)
             echo "$calculated_ip/$netmask"
             ;;
     esac
