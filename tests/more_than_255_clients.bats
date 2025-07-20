@@ -15,6 +15,10 @@ load teardown setup
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -eq 1 ]]
     [[ "${lines[0]}" == "Address = 10.99.0.222/16, fd72:5676:4409:7609::222/64" ]]
+    run grep 'AllowedIPs' wghub.conf
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -eq 1 ]]
+    [[ "${lines[0]}" == "AllowedIPs = 10.99.0.222/32, fd72:5676:4409:7609::222/128" ]]
 }
 
 @test "create 333 clients" {
@@ -30,6 +34,10 @@ load teardown setup
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -eq 1 ]]
     [[ "${lines[0]}" == "Address = 10.99.1.77/16, fd72:5676:4409:7609::333/64" ]]
+    run grep 'AllowedIPs' wghub.conf
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -eq 1 ]]
+    [[ "${lines[0]}" == "AllowedIPs = 10.99.1.77/32, fd72:5676:4409:7609::333/128" ]]
 }
 
 @test "create 4444 clients" {
@@ -45,4 +53,8 @@ load teardown setup
     [[ "$status" -eq 0 ]]
     [[ "${#lines[@]}" -eq 1 ]]
     [[ "${lines[0]}" == "Address = 10.99.17.92/16, fd72:5676:4409:7609::4444/64" ]]
+    run grep 'AllowedIPs' wghub.conf
+    [[ "$status" -eq 0 ]]
+    [[ "${#lines[@]}" -eq 1 ]]
+    [[ "${lines[0]}" == "AllowedIPs = 10.99.17.92/32, fd72:5676:4409:7609::4444/128" ]]
 }
