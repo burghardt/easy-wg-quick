@@ -673,6 +673,7 @@ download_and_install_wg_quick() {
         echo "Failed to create temporary file."
         exit 1
     }
+    # shellcheck disable=SC2329
     cleanup() {
         # until https://github.com/koalaman/shellcheck/issues/2660 resolved
         # shellcheck disable=SC2317
@@ -716,6 +717,7 @@ upgrade_easy_wg_quick() {
         echo "Failed to create temporary file."
         exit 1
     }
+    # shellcheck disable=SC2329
     cleanup() {
         # until https://github.com/koalaman/shellcheck/issues/2660 resolved
         # shellcheck disable=SC2317
