@@ -51,7 +51,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v5
       - name: hadolint
-        uses: hadolint/hadolint-action@v3.2.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Dockerfile
           failure-threshold: error
