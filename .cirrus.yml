@@ -3,9 +3,8 @@ test_task:
   name: FreeBSD test run
   freebsd_instance:
     matrix:
-      image_family: freebsd-15-0-snap
+      image_family: freebsd-15-0-amd64-ufs
       image_family: freebsd-14-3
-      image_family: freebsd-13-5
   env:
     CIRRUS_CLONE_DEPTH: 10
   pkginstall_script:
